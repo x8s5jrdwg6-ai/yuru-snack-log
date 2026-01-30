@@ -29,13 +29,13 @@
             </select>
           </div>
           <div class="stack">
-            <label>味名</label>
+            <label>分類</label>
             <div class="row">
-              <input class="input" type="text" name="flavorName" id="flavorName" required placeholder="例：サラダ">
-              <label class="btn" style="white-space:nowrap;">
-                <input type="checkbox" name="plainFlg" value="1" id="plainFlg" style="width:auto; min-height:auto;">プレーン</label>
+              <input class="input" type="text" name="flavorName" id="flavorName" required placeholder="例：Lサイズ サラダ">
+<!--              <label class="btn" style="white-space:nowrap;">-->
+<!--                <input type="checkbox" name="plainFlg" value="1" id="plainFlg" style="width:auto; min-height:auto;">プレーン</label>-->
             </div>
-            <div class="muted">「プレーン」をONにすると味名は固定されます</div>
+            <div class="muted">味や内容量ごとの登録をおすすめします</div>
           </div>
           <div class="stack">
             <label>カロリー(kcal)</label>
@@ -93,18 +93,18 @@
     </a>
   </nav>
   <script>
-		const cb = document.getElementById("plainFlg");
-	    const inp = document.getElementById("flavorName");
-	  
-	    cb?.addEventListener("change", () => {
-	      if (cb.checked) {
-	        inp.value = "プレーン";
-	        inp.readOnly = true;
-	      } else {
-	        inp.value = "";
-	        inp.readOnly = false;
-	      }
-	    });
+//		const cb = document.getElementById("plainFlg");
+//	    const inp = document.getElementById("flavorName");
+//	  
+//	    cb?.addEventListener("change", () => {
+//	      if (cb.checked) {
+//	        inp.value = "プレーン";
+//	        inp.readOnly = true;
+//	      } else {
+//	        inp.value = "";
+//	        inp.readOnly = false;
+//	      }
+//	    });
   		// iOS Safariで :active を確実に効かせる
 	  document.addEventListener('touchstart', () => {}, {passive:true});
 	  //	遷移時アニメーション

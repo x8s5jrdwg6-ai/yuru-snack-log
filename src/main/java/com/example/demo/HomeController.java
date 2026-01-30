@@ -358,7 +358,7 @@ public class HomeController {
 			@RequestParam(name="lipid", required=false) Double lipid,
 			@RequestParam(name="carbo", required=false) Double carbo,
 			@RequestParam(name="salt", required=false) Double salt,
-			@RequestParam(name="plainFlg", required=false) String plainFlg,
+//			@RequestParam(name="plainFlg", required=false) String plainFlg,
 			RedirectAttributes ra,
             HttpServletRequest req,
             HttpServletResponse res
@@ -366,10 +366,10 @@ public class HomeController {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
 		
-		// プレーンにチェックがあれば味を「プレーン」に固定
-		if ("1".equals(plainFlg)) {
-			flavorName = "プレーン";
-		}
+//		// プレーンにチェックがあれば味を「プレーン」に固定
+//		if ("1".equals(plainFlg)) {
+//			flavorName = "プレーン";
+//		}
 
 		// 重複チェック
 		if(intakeSvc.chkDepliFlavor(userId, flavorName, foodId) == -1) {
