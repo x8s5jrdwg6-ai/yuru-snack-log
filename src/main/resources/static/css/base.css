@@ -1,5 +1,15 @@
 @charset "UTF-8";
 
+.page{
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .35s ease-out, transform .35s ease-out;
+  will-change: opacity, transform;
+}
+.page.is-ready{
+  opacity: 1;
+  transform: translateY(0);
+}
 /* ==========
    iPhone reset
    ========== */

@@ -1,78 +1,79 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta charset="UTF-8">
   <title>間食カロリーチェッカー - 食べた！登録：食品</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" th:href="@{/css/base.css}">
-<!--  <link rel="stylesheet" th:href="@{/css/eat.css}">-->
-
+  <!--  <link rel="stylesheet" th:href="@{/css/eat.css}">-->
 </head>
+
 <body>
-<div class="container">
-
-  <div class="page-title">食べた！登録</div>
-  <div class="page-sub">② 食品を選択</div>
-
-  <div class="card">
-    <div class="muted">メーカー</div>
-    <div style="font-size:18px; font-weight:900;" th:text="${makerName}">maker</div>
-
-    <div class="row" style="margin-top:10px;">
-      <a class="btn btn-ghost tap" th:href="@{/eat}">← メーカー選択へ戻る</a>
-      <a class="btn btn-primary tap" th:href="@{/foods/new(makerId=${makerId})}">食品登録</a>
+  <div class="page">
+    <div class="container">
+      <div class="page-title">食べた！登録</div>
+      <div class="page-sub">② 食品を選択</div>
+      <div class="card">
+        <div class="muted">メーカー</div>
+        <div style="font-size:18px; font-weight:900;" th:text="${makerName}">maker</div>
+        <div class="row" style="margin-top:10px;">
+          <a class="btn btn-ghost tap" th:href="@{/eat}">← メーカー選択へ戻る</a>
+          <a class="btn btn-primary tap" th:href="@{/foods/new(makerId=${makerId})}">食品登録</a>
+        </div>
+      </div>
+      <div class="card" th:if="${#lists.isEmpty(foods)}">
+        <div class="muted">このメーカーの食品が未登録です</div>
+      </div>
+      <div class="card" th:if="${!#lists.isEmpty(foods)}">
+        <div class="muted" style="font-weight:800; margin-bottom:10px;">食品</div>
+        <div class="grid">
+          <a class="tile tap" th:each="f : ${foods}" th:href="@{/eat/flavors(foodId=${f.food_id})}">
+            <div class="tile-title" th:text="${f.food_name}">food</div>
+            <!--        <div class="tile-sub">タップして味へ</div>-->
+          </a>
+        </div>
+      </div>
+      <hr class="hr">
+      <div class="stack">
+        <a class="btn btn-ghost tap" th:href="@{/}">TOPへ戻る</a>
+      </div>
+      <div style="height:72px;">
+      </div>
     </div>
   </div>
-
-  <div class="card" th:if="${#lists.isEmpty(foods)}">
-    <div class="muted">このメーカーの食品が未登録です</div>
-  </div>
-
-  <div class="card" th:if="${!#lists.isEmpty(foods)}">
-    <div class="muted" style="font-weight:800; margin-bottom:10px;">食品</div>
-
-    <div class="grid">
-      <a class="tile tap"
-         th:each="f : ${foods}"
-         th:href="@{/eat/flavors(foodId=${f.food_id})}">
-        <div class="tile-title" th:text="${f.food_name}">food</div>
-<!--        <div class="tile-sub">タップして味へ</div>-->
+    <nav class="bottom-nav">
+      <a class="nav-item is-active" th:href="@{/eat}">
+        <div class="nav-emoji">🍽</div>
+        <div class="nav-label">食べた！</div>
       </a>
-    </div>
-  </div>
-
-  <hr class="hr">
-  
-  <div class="stack">
-    <a class="btn btn-ghost tap" th:href="@{/}">TOPへ戻る</a>
-  </div>
-  
-  <div style="height:72px;"></div>
-</div>
-
-<nav class="bottom-nav">
-	<a class="nav-item is-active" th:href="@{/eat}">
-	  <div class="nav-emoji">🍽</div>
-	  <div class="nav-label">食べた！</div>
-	</a>
-	<a class="nav-item" th:href="@{/makers/new}">
-	  <div class="nav-emoji">🏭</div>
-	  <div class="nav-label">メーカー登録</div>
-	</a>
-	<a class="nav-item" th:href="@{/foods/new}">
-	  <div class="nav-emoji">🧃</div>
-	  <div class="nav-label">食品情報登録</div>
-	</a>
-	<a class="nav-item" th:href="@{/flavors/new}">
-	  <div class="nav-emoji">🧂</div>
-	  <div class="nav-label">栄養情報登録</div>
-	</a>
-</nav>
-<script>
-  // iOS Safariで :active を確実に効かせる
-  document.addEventListener('touchstart', () => {}, {passive:true});
-</script>
-
+      <a class="nav-item" th:href="@{/makers/new}">
+        <div class="nav-emoji">🏭</div>
+        <div class="nav-label">メーカー登録</div>
+      </a>
+      <a class="nav-item" th:href="@{/foods/new}">
+        <div class="nav-emoji">🧃</div>
+        <div class="nav-label">食品情報登録</div>
+      </a>
+      <a class="nav-item" th:href="@{/flavors/new}">
+        <div class="nav-emoji">🧂</div>
+        <div class="nav-label">栄養情報登録</div>
+      </a>
+    </nav>
+	<script>
+	// iOS Safariで :active を確実に効かせる
+	document.addEventListener('touchstart', () => {}, {passive:true});
+	//	遷移時アニメーション
+	const kick = () => {
+	const el = document.querySelector(".page");
+	if(!el) return;
+	el.classList.remove("is-ready"); // 再点火用
+	requestAnimationFrame(() => el.classList.add("is-ready"));
+	};
+	document.addEventListener("DOMContentLoaded", kick);
+	// iOS/Safari の戻る(キャッシュ復元)でも再点火
+	window.addEventListener("pageshow", kick);
+	</script>
 </body>
 </html>
