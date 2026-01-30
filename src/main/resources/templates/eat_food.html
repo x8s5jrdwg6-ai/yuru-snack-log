@@ -31,7 +31,6 @@
         <div class="grid">
           <a class="tile tap" th:each="f : ${foods}" th:href="@{/eat/flavors(foodId=${f.food_id})}">
             <div class="tile-title" th:text="${f.food_name}">food</div>
-            <!--        <div class="tile-sub">タップして味へ</div>-->
           </a>
         </div>
       </div>

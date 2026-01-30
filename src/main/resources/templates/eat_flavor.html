@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>間食カロリーチェッカー - 食べた！登録：味</title>
+  <title>間食カロリーチェッカー - 食べた！登録：栄養情報</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" th:href="@{/css/base.css}">
   <!--  <link rel="stylesheet" th:href="@{/css/eat.css}">-->
@@ -13,7 +13,7 @@
   <div class="page">
     <div class="container">
       <div class="page-title">食べた！登録</div>
-      <div class="page-sub">③ 味を選んで「食べた！」を押す</div>
+      <div class="page-sub">③ 分類を選んで「食べた！」を押す</div>
       <div class="card">
         <div class="muted">メーカー</div>
         <div style="font-weight:900;" th:text="${header.makerName}">maker</div>
@@ -27,10 +27,10 @@
       <div th:if="${error}" class="error" th:text="${error}">
       </div>
       <div class="card" th:if="${#lists.isEmpty(flavors)}">
-        <div class="muted">味が未登録です</div>
+        <div class="muted">分類が未登録です</div>
       </div>
       <div class="card" th:if="${!#lists.isEmpty(flavors)}">
-        <div class="muted" style="font-weight:800; margin-bottom:10px;">味一覧</div>
+        <div class="muted" style="font-weight:800; margin-bottom:10px;">分類一覧</div>
         <div class="stack">
           <div class="card" th:each="fl : ${flavors}" style="padding:12px;">
             <div class="row" style="justify-content:space-between; align-items:flex-start;">

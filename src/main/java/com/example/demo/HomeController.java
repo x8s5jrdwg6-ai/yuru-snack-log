@@ -198,7 +198,7 @@ public class HomeController {
 		// ユーザーIDと食品IDに紐づく食品情報とメーカ情報を取得
 		Map<String, Object> headerInfo = intakeSvc.getHeaderInfo(userId, foodId);
 
-		// ユーザーIDと食品IDに紐づく味一覧を取得
+		// ユーザーIDと食品IDに紐づく分類一覧を取得
 		List<Map<String, Object>> flavorList = intakeSvc.getFlavorList(userId, foodId);
 		
 		model.addAttribute("header", headerInfo);
@@ -373,7 +373,7 @@ public class HomeController {
 
 		// 重複チェック
 		if(intakeSvc.chkDepliFlavor(userId, flavorName, foodId) == -1) {
-			ra.addFlashAttribute("msg", "同じ味の栄養情報が既に登録されています");
+			ra.addFlashAttribute("msg", "同じ分類の栄養情報が既に登録されています");
 			return "redirect:/flavors/new";
 		}
 

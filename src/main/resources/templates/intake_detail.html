@@ -16,13 +16,24 @@
       <div class="page-title">詳細</div>
       <!--  <div class="page-sub">カロリー以外も見れます</div>-->
       <div class="card">
-        <div class="muted">食べた日時</div>
-        <div style="font-weight:900;" th:text="${#strings.substring(eatenDatetime, 0, 16)}">2026-01-28 12:34</div>
+        <div class="stack_3">
+          <div>		
+            <div class="muted">食べた日時</div>
+            <div style="font-weight:900;" th:text="${#strings.substring(eatenDatetime, 0, 16)}">2026-01-28 12:34</div>
+          </div>
+          <div class="row" style="margin: 0 0 0 auto;">
+            <a class="btn btn-primary tap" th:href="@{/intake/edit(intakeId=${intakeId})}">編集</a>
+            <form th:action="@{/intake/delete}" method="post" style="margin:0;">
+              <input type="hidden" name="intakeId" th:value="${intakeId}">
+              <button class="btn btn-danger tap" type="submit" onclick="return confirm('この履歴を削除しますか？');">削除</button>
+            </form>
+          </div>
+        </div>
         <div class="muted" style="margin-top:10px;">メーカー</div>
         <div style="font-weight:900;" th:text="${makerName}">Calbee</div>
         <div class="muted" style="margin-top:10px;">食品</div>
         <div style="font-weight:900;" th:text="${foodName}">じゃがりこ</div>
-        <div class="muted" style="margin-top:10px;">味</div>
+        <div class="muted" style="margin-top:10px;">分類</div>
         <div style="font-weight:900;" th:text="${flavorName}">サラダ</div>
         <!--    <div class="muted" style="margin-top:10px;">数量</div>-->
         <!--    <div style="font-weight:900;"><span th:text="${d.qty}">1</span></div>-->
@@ -56,13 +67,7 @@
           </div>
         </div>
       </div>
-      <div class="row" style="margin-top:12px;">
-        <a class="btn btn-primary tap" th:href="@{/intake/edit(intakeId=${intakeId})}">編集</a>
-        <form th:action="@{/intake/delete}" method="post" style="margin:0;">
-          <input type="hidden" name="intakeId" th:value="${intakeId}">
-          <button class="btn btn-danger tap" type="submit" onclick="return confirm('この履歴を削除しますか？');">削除</button>
-        </form>
-      </div>
+	  <hr class="hr">
       <div class="stack">
         <a class="btn btn-ghost tap" th:href="@{/}">TOPへ戻る</a>
       </div>
