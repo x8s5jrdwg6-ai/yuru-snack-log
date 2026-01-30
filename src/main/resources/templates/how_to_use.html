@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta charset="UTF-8">
+  <title>間食カロリーチェッカー - 使い方</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+
+<body>
+  <div class="page" style="text-align: center;">
+	<h2 class="page-title">使い方</h2>
+	<div class="container_2">
+		<div class="card" style="margin-top:12px;">
+<!--			<p>1</p>-->
+			<div class="card step" style="margin-top:12px;" data-step="1">
+				<p>画面下のナビゲーションバーから「メーカー登録」を行います</p>
+			</div>
+<!--			<p>2</p>-->
+			<div class="card step" style="margin-top:12px;" data-step="2">
+				<p>続いて食品情報を登録します</p>
+			</div>
+<!--			<p>3</p>-->
+			<div class="card step" style="margin-top:12px;" data-step="3">
+				<p>最後に栄養情報を登録し、カロリーなどの情報を設定します</p>
+			</div>
+<!--			<p>4</p>-->
+			<div class="card step" style="margin-top:12px;" data-step="4">
+				<p>ナビゲーションバー左下の「食べた！」からメーカーと食品を選択し、最後に食べた味の「食べた！」ボタンを押します</p>
+			</div>
+<!--			<p>5</p>-->
+			<div class="card step" style="margin-top:12px;" data-step="5">
+				<p>食べた食品のカロリーが記録されます</p>
+			</div>
+<!--			<p>6</p>-->
+			<div class="card step" style="margin-top:12px;" data-step="6">
+				<p>摂取カロリーを管理できるため、<b>痩せます</b></p>
+			</div>
+		</div>
+		<div class="stack_how">
+			<a class="btn btn-ghost tap" th:href="@{/}">戻る</a>
+		</div>
+	</div>
+  </div>
+  <script>
+  // iOS Safariで :active を確実に効かせる
+  document.addEventListener('touchstart', () => {}, {passive:true});
+  //	遷移時アニメーション
+  const kick = () => {
+  const el = document.querySelector(".page");
+  if(!el) return;
+  el.classList.remove("is-ready"); // 再点火用
+  requestAnimationFrame(() => el.classList.add("is-ready"));
+  };
+  document.addEventListener("DOMContentLoaded", kick);
+  // iOS/Safari の戻る(キャッシュ復元)でも再点火
+  window.addEventListener("pageshow", kick);
+  </script>
+</body>
+</html>
