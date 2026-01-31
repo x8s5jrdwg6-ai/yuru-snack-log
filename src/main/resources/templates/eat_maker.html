@@ -15,8 +15,8 @@
       <div class="page-title">食べた！登録</div>
       <div class="page-sub">① メーカーを選択</div>
       <div class="card" th:if="${#lists.isEmpty(makers)}">
-        <div class="muted">メーカーが未登録です</div>
-        <div style="margin-top:10px;">
+        <div class="muted" style="text-align: center;">メーカーが未登録です</div>
+        <div style="margin-top:10px; display: flex; justify-content: center;">
           <a class="btn btn-primary" th:href="@{/makers/new}">メーカー登録へ</a>
         </div>
       </div>

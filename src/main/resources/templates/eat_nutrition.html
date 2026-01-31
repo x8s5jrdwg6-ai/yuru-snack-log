@@ -21,7 +21,7 @@
         <div style="font-weight:900;" th:text="${header.foodName}">food</div>
         <div class="row" style="margin-top:10px;">
           <a class="btn btn-ghost tap" th:href="@{/eat/foods(makerId=${header.makerId})}">← 食品選択へ戻る</a>
-          <a class="btn btn-primary tap" th:href="@{/nutritions/new(foodId=${header.foodId})}">栄養情報登録</a>
+          <a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/nutritions/new(foodId=${header.foodId})}">栄養情報登録</a>
         </div>
       </div>
       <div th:if="${error}" class="error" th:text="${error}">

@@ -20,11 +20,11 @@
         <div style="font-size:18px; font-weight:900;" th:text="${makerName}">maker</div>
         <div class="row" style="margin-top:10px;">
           <a class="btn btn-ghost tap" th:href="@{/eat}">← メーカー選択へ戻る</a>
-          <a class="btn btn-primary tap" th:href="@{/foods/new(makerId=${makerId})}">食品登録</a>
+          <a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/foods/new(makerId=${makerId})}">食品登録</a>
         </div>
       </div>
       <div class="card" th:if="${#lists.isEmpty(foods)}">
-        <div class="muted">このメーカーの食品が未登録です</div>
+        <div class="muted">このメーカーの食品は登録されていません</div>
       </div>
       <div class="card" th:if="${!#lists.isEmpty(foods)}">
         <div class="muted" style="font-weight:800; margin-bottom:10px;">食品</div>
