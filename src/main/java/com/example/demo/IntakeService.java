@@ -31,9 +31,9 @@ public class IntakeService {
 		return intakeRepo.calcTotalCal(userId, eatenDate);
 	}
 
-	public int insIntake(String userId, long flavorId) {
+	public int insIntake(String userId, long nutritionId) {
 		LocalDateTime now = LocalDateTime.now();
-		return intakeRepo.insIntake(userId, flavorId, now.toLocalDate(), now.toLocalTime());
+		return intakeRepo.insIntake(userId, nutritionId, now.toLocalDate(), now.toLocalTime());
 	}
 	
 	public void updIntake(String userId, long intakeId, LocalDate eatenDate, LocalTime eatenTime) {
@@ -71,16 +71,16 @@ public class IntakeService {
 		return true;
 	}
 	
-	public boolean chkDepliFlavor(String userId, String flavorName, long foodId) {
+	public boolean chkDepliNutrition(String userId, String nutritionName, long foodId) {
 		//重複チェック
-		if(intakeRepo.chkDepliFlavor(userId, flavorName, foodId)) {
+		if(intakeRepo.chkDepliNutrition(userId, nutritionName, foodId)) {
 			return false;	// エラー
 		}
 		return true;
 	}
 	
-	public void insFlavor(String userId, String flavorName, long foodId, int calorie, Double protein, Double lipid, Double carbo, Double salt) {
-		intakeRepo.insFlavor(userId, flavorName, foodId, calorie, protein, lipid, carbo, salt);
+	public void insNutrition(String userId, String nutritionName, long foodId, int calorie, Double protein, Double lipid, Double carbo, Double salt) {
+		intakeRepo.insNutrition(userId, nutritionName, foodId, calorie, protein, lipid, carbo, salt);
 		
 	}
 	
@@ -104,8 +104,8 @@ public class IntakeService {
 		return intakeRepo.getHeaderInfo(userId, foodId);
 	}
 	
-	public List<Map<String, Object>> getFlavorList(String userId, long foodId){
-		return intakeRepo.getFlavorList(userId, foodId);
+	public List<Map<String, Object>> getNutritionList(String userId, long foodId){
+		return intakeRepo.getNutritionList(userId, foodId);
 	}
 	
 	public String chkUserId(HttpServletRequest req, String uidCookie) {

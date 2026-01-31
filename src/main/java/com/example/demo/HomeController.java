@@ -52,7 +52,7 @@ public class HomeController {
 	/*--------------------------------------
 		record
 	--------------------------------------*/
-	public record IntakeRow(long intakeId, String eatenDate, String eatenTime, double qty, String foodName, String flavorName, int calorie) {
+	public record IntakeRow(long intakeId, String eatenDate, String eatenTime, double qty, String foodName, String nutritionName, int calorie) {
 		public int kcalTotal() {
 			return (int) Math.round(calorie * qty);
 		}
@@ -123,7 +123,7 @@ public class HomeController {
 		model.addAttribute("eatenDatetime", (map.get("eatenDate") + " " + map.get("eatenTime")));
 		model.addAttribute("makerName", map.get("makerName"));
 		model.addAttribute("foodName", map.get("foodName"));
-		model.addAttribute("flavorName", map.get("flavorName"));
+		model.addAttribute("nutritionName", map.get("nutritionName"));
 		model.addAttribute("calorie", map.get("calorie"));
 		model.addAttribute("protein", map.get("protein"));
 		model.addAttribute("lipid", map.get("lipid"));
@@ -155,7 +155,7 @@ public class HomeController {
 		model.addAttribute("eatenDate", (map.get("eatenDate")));
 		model.addAttribute("eatenTime", (map.get("eatenTime")));
 		model.addAttribute("foodName", map.get("foodName"));
-		model.addAttribute("flavorName", map.get("flavorName"));
+		model.addAttribute("nutritionName", map.get("nutritionName"));
 		model.addAttribute("calorie", map.get("calorie"));
 
 		return "intake_edit";
@@ -198,8 +198,8 @@ public class HomeController {
 	}
 	
 	// 食べた登録画面：食品選択画面：食品選択時
-	@GetMapping("/eat/flavors")
-	public String eatFlavors(@RequestParam("foodId") long foodId,
+	@GetMapping("/eat/nutritions")
+	public String eatNutritions(@RequestParam("foodId") long foodId,
 			@RequestParam(name="error", required=false) String error,
 			Model model,
             HttpServletRequest req,
@@ -211,12 +211,12 @@ public class HomeController {
 		Map<String, Object> headerInfo = intakeSvc.getHeaderInfo(userId, foodId);
 
 		// ユーザーIDと食品IDに紐づく分類一覧を取得
-		List<Map<String, Object>> flavorList = intakeSvc.getFlavorList(userId, foodId);
+		List<Map<String, Object>> nutritionList = intakeSvc.getNutritionList(userId, foodId);
 		
 		model.addAttribute("header", headerInfo);
-		model.addAttribute("flavors", flavorList);
+		model.addAttribute("nutritions", nutritionList);
 		model.addAttribute("error", error);
-		return "eat_flavor";
+		return "eat_nutrition";
 	}
 	
 	// ナビゲーション：メーカー登録押下時
@@ -250,8 +250,8 @@ public class HomeController {
 	
 	// ナビゲーション：栄養情報登録押下時
 	// 食品情報登録画面：「食品を選択して栄養情報登録へ進む」押下時
-	@GetMapping("/flavors/new")
-	public String flavorNew(Model model,
+	@GetMapping("/nutritions/new")
+	public String nutritionNew(Model model,
 			@RequestParam(name="foodId", required=false) Long foodId,
 			@RequestParam(name="error", required=false) String error,
             HttpServletRequest req,
@@ -268,7 +268,7 @@ public class HomeController {
 		model.addAttribute("foods", foods);
 		model.addAttribute("selectedFoodId", foodId); // 初期選択用
 		model.addAttribute("error", error);
-		return "flavor_new";
+		return "nutrition_new";
 	}
 	
 	/*--------------------------------------
@@ -373,16 +373,16 @@ public class HomeController {
 		int foodId = intakeSvc.insFood(userId, foodName, makerId);
 
 		ra.addFlashAttribute("msg", "食品を登録しました。続けて栄養情報を登録してください");
-		return "redirect:/flavors/new?foodId=" + Integer.toString(foodId);
+		return "redirect:/nutritions/new?foodId=" + Integer.toString(foodId);
 	}
 
 	/*--------------------------------------
 		栄養情報登録画面
 	--------------------------------------*/
-	@PostMapping("/flavors/create")
-	public String flavorCreate(
+	@PostMapping("/nutritions/create")
+	public String nutritionCreate(
 			@RequestParam("foodId") long foodId,
-			@RequestParam("flavorName") String flavorName,
+			@RequestParam("nutritionName") String nutritionName,
 			@RequestParam("calorie") int calorie,
 			@RequestParam(name="protein", required=false) Double protein,
 			@RequestParam(name="lipid", required=false) Double lipid,
@@ -402,16 +402,16 @@ public class HomeController {
 //		}
 
 		// 栄養情報重複チェック true：重複なし false：重複あり
-		if(!intakeSvc.chkDepliFlavor(userId, flavorName, foodId)) {
+		if(!intakeSvc.chkDepliNutrition(userId, nutritionName, foodId)) {
 			ra.addFlashAttribute("errorMsg", "同じ分類の栄養情報が既に登録されています");
-			return "redirect:/flavors/new";
+			return "redirect:/nutritions/new";
 		}
 
 		// 栄養情報登録
-		intakeSvc.insFlavor(userId, flavorName, foodId, calorie, protein, lipid, carbo, salt);
+		intakeSvc.insNutrition(userId, nutritionName, foodId, calorie, protein, lipid, carbo, salt);
 
 		ra.addFlashAttribute("msg", "栄養情報を登録しました");
-		return "redirect:/flavors/new";
+		return "redirect:/nutritions/new";
 	}
 
 	/*--------------------------------------
@@ -419,14 +419,14 @@ public class HomeController {
 	--------------------------------------*/
 	// 食べた！押下時
 	@PostMapping("/eat/record")
-	public String eatRecord(@RequestParam("flavorId") long flavorId,
+	public String eatRecord(@RequestParam("nutritionId") long nutritionId,
 			RedirectAttributes ra,
             HttpServletRequest req,
             HttpServletResponse res) {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
 		
-		intakeSvc.insIntake(userId, flavorId);
+		intakeSvc.insIntake(userId, nutritionId);
 		ra.addFlashAttribute("msg", "食べた！を記録しました。");
 		return "redirect:/";
 	}
