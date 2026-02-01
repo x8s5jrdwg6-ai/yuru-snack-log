@@ -2,110 +2,94 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta charset="UTF-8">
-  <title>ゆるゆる間食ログ - 栄養情報登録</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta charset="UTF-8">
+	<title>ゆるゆる間食ログ - 栄養情報登録</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-  <div class="page">
-    <div class="container">
-      <div class="page-title">栄養情報登録</div>
-      <div class="page-sub">食品を選んで分類と栄養情報を登録します</div>
-      <div th:if="${msg}" class="toast" th:text="${msg}"></div>
-      <div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}"></div>
-      <div th:if="${error}" class="error" th:text="${error}"></div>
-      <div class="card" style="margin-top:10px;">
-        <form th:action="@{/nutritions/create}" method="post" class="stack">
-          <div class="stack">
-            <label>食品</label>
-            <select name="foodId" required>
-              <option value="" disabled th:selected="${selectedFoodId == null}">選択してください</option>
-              <option th:each="f : ${foods}" th:value="${f.food_id}" th:text="${f.food_name}" th:selected="${selectedFoodId != null and f.food_id == selectedFoodId}">
-              </option>
-            </select>
-          </div>
-          <div class="stack">
-			<div class="row">
-				<label>分類</label><label class="muted" style="font-size: 75%; padding-left:10px;">味や内容量ごとの登録をおすすめします</label>
+	<div class="page">
+		<div class="container">
+			<div class="page-title">栄養情報登録</div>
+			<div class="page-sub">食品を選んで分類と栄養情報を登録します</div>
+			<div th:if="${msg}" class="toast" th:text="${msg}">
 			</div>
-            <div class="row">
-              <input class="input" type="text" name="className" id="className" required placeholder="例：Lサイズ サラダ味">
-<!--              <label class="btn" style="white-space:nowrap;">-->
-<!--                <input type="checkbox" name="plainFlg" value="1" id="plainFlg" style="width:auto; min-height:auto;">プレーン</label>-->
-            </div>
-          </div>
-          <div class="stack">
-            <label>カロリー(kcal)</label>
-            <input class="input" type="number" name="calorie" min="0" required placeholder="例：333">
-          </div>
-          <div class="grid-tiles">
-            <div class="stack">
-              <label>たんぱく質(g)</label>
-              <input class="input" type="number" name="protein" step="0.1" placeholder="任意 小数第1位まで入力できます">
-            </div>
-            <div class="stack" style="padding-top: 10px;">
-              <label>脂質(g)</label>
-              <input class="input" type="number" name="lipid" step="0.1" placeholder="任意 小数第1位まで入力できます">
-            </div>
-            <div class="stack" style="padding-top: 10px;">
-              <label>炭水化物(g)</label>
-              <input class="input" type="number" name="carbo" step="0.1" placeholder="任意 小数第1位まで入力できます">
-            </div>
-            <div class="stack" style="padding-top: 10px;">
-              <label>塩分(g)</label>
-              <input class="input" type="number" name="salt" step="0.01" placeholder="任意 小数第2位まで入力できます">
-            </div>
-          </div>
-          <br>
-          <button class="btn btn-primary tap" type="submit">登録</button>
-        </form>
-      </div>
-      <hr class="hr">
-      <div class="stack">
-        <a class="btn btn-ghost tap" th:href="@{/}">TOPへ戻る</a>
-      </div>
-	  <!-- 下固定ナビ -->
-	      <div style="height:72px;">
-	      </div>
-    </div>
-  </div>
-    
-  </div>
-  <nav class="bottom-nav">
-    <a class="nav-item" th:href="@{/eat}">
-      <div class="nav-emoji">🍽</div>
-      <div class="nav-label">食べた！</div>
-    </a>
-    <a class="nav-item" th:href="@{/makers/new}">
-      <div class="nav-emoji">🏭</div>
-      <div class="nav-label">メーカー登録</div>
-    </a>
-    <a class="nav-item" th:href="@{/foods/new}">
-      <div class="nav-emoji">🧃</div>
-      <div class="nav-label">食品情報登録</div>
-    </a>
-    <a class="nav-item is-active" th:href="@{/nutritions/new}">
-      <div class="nav-emoji">🧂</div>
-      <div class="nav-label">栄養情報登録</div>
-    </a>
-  </nav>
-  <script>
-//		const cb = document.getElementById("plainFlg");
-//	    const inp = document.getElementById("flavorName");
-//	  
-//	    cb?.addEventListener("change", () => {
-//	      if (cb.checked) {
-//	        inp.value = "プレーン";
-//	        inp.readOnly = true;
-//	      } else {
-//	        inp.value = "";
-//	        inp.readOnly = false;
-//	      }
-//	    });
-  		// iOS Safariで :active を確実に効かせる
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
+			</div>
+			<div th:if="${error}" class="error" th:text="${error}">
+			</div>
+			<div class="card" style="margin-top:10px;">
+				<form th:action="@{/nutritions/create}" method="post" class="stack">
+					<div class="stack">
+						<label>食品</label>
+						<select name="foodId" required>
+							<option value="" disabled th:selected="${selectedFoodId == null}">選択してください</option>
+							<option th:each="f : ${foods}" th:value="${f.food_id}" th:text="${f.food_name}" th:selected="${selectedFoodId != null and f.food_id == selectedFoodId}">
+							</option>
+						</select>
+					</div>
+					<div class="stack">
+						<div class="row">
+							<label>分類</label>
+							<label class="muted" style="font-size: 75%; padding-left:10px;">味や内容量ごとの登録がおすすめです</label>
+						</div>
+						<div class="row">
+							<input class="input" type="text" name="className" id="className" required placeholder="例：Lサイズ サラダ味">
+							<!--              <label class="btn" style="white-space:nowrap;">-->
+							<!--                <input type="checkbox" name="plainFlg" value="1" id="plainFlg" style="width:auto; min-height:auto;">プレーン</label>-->
+						</div>
+					</div>
+					<div class="stack">
+						<label>カロリー(kcal)</label>
+						<input class="input" type="number" name="calorie" min="0" required placeholder="例：333">
+					</div>
+					<div class="grid-tiles">
+						<div class="stack">
+							<label>たんぱく質(g)</label>
+							<input class="input" type="number" name="protein" step="0.1" placeholder="任意 小数点1桁まで入力できます">
+						</div>
+						<div class="stack" style="padding-top: 10px;">
+							<label>脂質(g)</label>
+							<input class="input" type="number" name="lipid" step="0.1" placeholder="任意 小数点1桁まで入力できます">
+						</div>
+						<div class="stack" style="padding-top: 10px;">
+							<label>炭水化物(g)</label>
+							<input class="input" type="number" name="carbo" step="0.1" placeholder="任意 小数点1桁まで入力できます">
+						</div>
+						<div class="stack" style="padding-top: 10px;">
+							<label>塩分(g)</label>
+							<input class="input" type="number" name="salt" step="0.01" placeholder="任意 小数点2桁まで入力できます">
+						</div>
+					</div>
+					<br>
+					<button class="btn btn-primary tap" type="submit">登録</button>
+				</form>
+			</div>
+			<hr class="hr">
+			<div class="stack">
+				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
+			</div>
+			<!-- 下固定ナビ -->
+			<div style="height:72px;">
+			</div>
+		</div>
+	</div>
+	<nav class="bottom-nav">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+			<i class="fa-solid fa-house"></i> Home
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+			<i class="fa-solid fa-utensils"></i> 食べた！
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+			<i class="fa-solid fa-bars"></i> メニュー
+		</a>
+	</nav>
+	<script>
+	// iOS Safariで :active を確実に効かせる
 	  document.addEventListener('touchstart', () => {}, {passive:true});
 	  //	遷移時アニメーション
 	  const kick = () => {
@@ -117,6 +101,7 @@
 	  document.addEventListener("DOMContentLoaded", kick);
 	  // iOS/Safari の戻る(キャッシュ復元)でも再点火
 	  window.addEventListener("pageshow", kick);
-  </script>
+	</script>
 </body>
+
 </html>

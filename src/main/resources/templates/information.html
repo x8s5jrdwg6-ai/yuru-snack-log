@@ -2,66 +2,90 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta charset="UTF-8">
-  <title>ゆるゆる間食ログ - お知らせ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta charset="UTF-8">
+	<title>ゆるゆる間食ログ - お知らせ</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-  <div class="page" style="text-align: center;">
-	<h2 class="page-title">お知らせ</h2>
-<!--	<h4>既知の不具合情報</h4>-->
-<!--	<div class="container_2" style="padding-bottom: 20px;">-->
-<!--		<div class="card" style="margin-top:12px;">-->
-<!--			<div class="card" style="margin-top:12px;">-->
-<!--				<p><b>食べた！</b>を登録した際、稀に"<b>Whitelabel Error Page</b>"が表示されることがあります。</p>-->
-<!--				<p>その場合でも登録自体は行われていますので、お手数ですがアプリを立ち上げ直して再表示を行ってください。</p>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--	</div>-->
-	<h4>今後の実装予定</h4>
-	<div class="container_2">
-		<div class="card" style="margin-top:12px;">
+	<div class="page" style="text-align: center;">
+		<h2 class="page-title">お知らせ</h2>
+		<h4>リリースノート</h4>
+		<div class="container_2" style="padding-bottom: 20px;">
 			<div class="card" style="margin-top:12px;">
-				<p>登録したメーカーの修正・削除機能追加</p>
-			</div>
-			<div class="card" style="margin-top:12px;">
-				<p>登録した食品情報の修正・削除機能追加</p>
-			</div>
-			<div class="card" style="margin-top:12px;">
-				<p>登録した栄養情報の修正・削除機能追加</p>
-			</div>
-			<div class="card" style="margin-top:12px;">
-				<p>カロリー以外の栄養情報の集計機能追加</p>
-			</div>
-			<div class="card" style="margin-top:12px;">
-				<p>メーカー・食品情報のソート機能追加</p>
+				<div class="card step" style="margin-top:12px;" data-step="v1.0.0（2026.02.01）">
+					<p>ゆるゆる間食ログを公開しました</p>
+				</div>
 			</div>
 		</div>
-		<div>
-			<p>developed by <a href="https://x.com/nolotgsv" style="color: inherit; text-decoration: none;"><b>のる@nolotgsv</a></b></p>
-		</div>
-		<hr class="hr">
-		<div class="stack">
-		  <a class="btn btn-ghost tap" th:href="@{/}">TOPへ戻る</a>
+		<!--	<h4>既知の不具合情報</h4>-->
+		<!--	<div class="container_2" style="padding-bottom: 20px;">-->
+		<!--		<div class="card" style="margin-top:12px;">-->
+		<!--			<div class="card" style="margin-top:12px;">-->
+		<!--				<p><b>食べた！</b>を登録した際、稀に"<b>Whitelabel Error Page</b>"が表示されることがあります。</p>-->
+		<!--				<p>その場合でも登録自体は行われていますので、お手数ですがアプリを立ち上げ直して再表示を行ってください。</p>-->
+		<!--			</div>-->
+		<!--		</div>-->
+		<!--	</div>-->
+		<h4>今後の実装予定</h4>
+		<div class="container_2">
+			<div class="card" style="margin-top:12px;">
+				<div class="card" style="margin-top:12px;">
+					<p>Home画面から1タップで
+						<b>食べた！</b>を記録できる</p>
+					<p>お気に入りショートカット機能</p>
+				</div>
+				<div class="card" style="margin-top:12px;">
+					<p>登録したメーカー・食品情報・栄養情報の</p>
+					<p>修正削除機能</p>
+				</div>
+				<div class="card" style="margin-top:12px;">
+					<p>メーカー・食品情報のソート機能</p>
+				</div>
+			</div>
+			<hr class="hr">
+			<div class="stack">
+				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
+			</div>
+			<div style="padding-top: 10px;">
+				<p>ゆるゆる間食ログ - v1.0.0</p>
+				<p>developed by
+					<a href="https://x.com/nolotgsv" style="color: inherit; text-decoration: none;">
+						<b>のる@nolotgsv</b>
+					</a>
+				</p>
+			</div>
+			
 		</div>
 	</div>
- </div>
-  <script>
-  // iOS Safariで :active を確実に効かせる
-  document.addEventListener('touchstart', () => {}, {passive:true});
-  //	遷移時アニメーション
-  const kick = () => {
-  const el = document.querySelector(".page");
-  if(!el) return;
-  el.classList.remove("is-ready"); // 再点火用
-  requestAnimationFrame(() => el.classList.add("is-ready"));
-  };
-  document.addEventListener("DOMContentLoaded", kick);
-  // iOS/Safari の戻る(キャッシュ復元)でも再点火
-  window.addEventListener("pageshow", kick);
-  </script>
+	<nav class="bottom-nav">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+			<i class="fa-solid fa-house"></i> Home
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+			<i class="fa-solid fa-utensils"></i> 食べた！
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+			<i class="fa-solid fa-bars"></i> メニュー
+		</a>
+	</nav>
+	<script>
+		// iOS Safariで :active を確実に効かせる
+		document.addEventListener('touchstart', () => {}, {passive:true});
+		//	遷移時アニメーション
+		const kick = () => {
+		const el = document.querySelector(".page");
+		if(!el) return;
+		el.classList.remove("is-ready"); // 再点火用
+		requestAnimationFrame(() => el.classList.add("is-ready"));
+		};
+		document.addEventListener("DOMContentLoaded", kick);
+		// iOS/Safari の戻る(キャッシュ復元)でも再点火
+		window.addEventListener("pageshow", kick);
+	</script>
 </body>
+
 </html>

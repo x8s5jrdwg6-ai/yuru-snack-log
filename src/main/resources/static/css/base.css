@@ -85,6 +85,36 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,.05);
 }
 
+.registlink{
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.05);
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  background: #f1f5f9;
+  color: #1f2937;
+  font-weight: bold;
+}
+
+
+
+/*display: inline-flex;*/
+/*align-items: center;*/
+/*justify-content: center;*/
+/*padding: 12px 14px;*/
+/*border-radius: 12px;*/
+/*font-size: 14px;*/
+/*font-weight: 700;*/
+/*border: none;*/
+/*text-decoration: none;*/
+/*cursor: pointer;*/
+
 /* ==========
    layout helpers
    ========== */
@@ -220,7 +250,7 @@ label {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 72px;
+  height: 90px;
   background: #ffffff;
   display: flex;
   border-top: 1px solid #e5e7eb;
@@ -237,9 +267,16 @@ label {
   font-size: 11px;
 }
 
-.nav-emoji {
-  font-size: 20px;
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 15px;
 }
+
 
 .list-link{
   color: inherit;
@@ -330,4 +367,7 @@ input[type="time"]::-webkit-date-and-time-value{
 /*  font-weight: 900;           太く */
   font-size: 18px;           /* 少し大きく */
   color: #9ca3af;            /* 濃いグレー（黒すぎない） */
+  
+  
+  
 }

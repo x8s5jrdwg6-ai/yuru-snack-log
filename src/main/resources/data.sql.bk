@@ -1,2 +1,0 @@
-insert into food (name, kcal) values ('in BAR PROTEIN ベイクドチョコ', 199);
-insert into food (name, kcal) values ('じゃがりこ Lサイズ じゃがバター', 333);

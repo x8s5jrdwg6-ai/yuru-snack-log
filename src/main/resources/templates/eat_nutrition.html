@@ -2,90 +2,85 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="UTF-8">
-  <title>ゆるゆる間食ログ - 食べた！登録：栄養情報</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <link rel="stylesheet" th:href="@{/css/base.css}">
-  <!--  <link rel="stylesheet" th:href="@{/css/eat.css}">-->
+	<meta charset="UTF-8">
+	<title>ゆるゆる間食ログ - 食べた！登録：栄養情報</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-  <div class="page">
-    <div class="container">
-      <div class="page-title">食べた！登録</div>
-      <div class="page-sub">③ 分類を選んで「<b>食べた！</b>」を押す</div>
-      <div class="card">
-        <div class="muted">メーカー</div>
-        <div style="font-weight:900;" th:text="${header.makerName}">maker</div>
-        <div class="muted" style="margin-top:6px;">食品</div>
-        <div style="font-weight:900;" th:text="${header.foodName}">food</div>
-        <div class="row" style="margin-top:10px;">
-          <a class="btn btn-ghost tap" th:href="@{/eat/foods(makerId=${header.makerId})}">← 食品選択へ戻る</a>
-          <a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/nutritions/new(foodId=${header.foodId})}">栄養情報登録</a>
-        </div>
-      </div>
-      <div th:if="${error}" class="error" th:text="${error}">
-      </div>
-      <div class="card" th:if="${#lists.isEmpty(nutritions)}">
-        <div class="muted">栄養情報が未登録です</div>
-      </div>
-      <div class="card" th:if="${!#lists.isEmpty(nutritions)}">
-        <div class="muted" style="font-weight:800; margin-bottom:10px;">分類一覧</div>
-        <div class="stack">
-          <div class="card" th:each="fl : ${nutritions}" style="padding:12px;">
-            <div class="row" style="justify-content:space-between; align-items:flex-start;">
-              <div class="stack" style="gap:6px;">
-                <div style="font-weight:900;" th:text="${fl.class_name}">サラダ</div>
-                <div class="muted">
-                  <span th:text="${fl.calorie}">0</span>kcal</div>
-              </div>
-              <form th:action="@{/eat/record}" method="post" style="margin:0;">
-                <input type="hidden" name="nutritionId" th:value="${fl.nutrition_id}">
-                <button class="btn btn-primary tap" type="submit">食べた！</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr class="hr">
-      <div class="stack">
-        <a class="btn btn-ghost tap" th:href="@{/}">TOPへ戻る</a>
-      </div>
-      <div style="height:72px;">
-      </div>
-    </div>
-  </div>
-    <nav class="bottom-nav">
-      <a class="nav-item is-active" th:href="@{/eat}">
-        <div class="nav-emoji">🍽</div>
-        <div class="nav-label">食べた！</div>
-      </a>
-      <a class="nav-item" th:href="@{/makers/new}">
-        <div class="nav-emoji">🏭</div>
-        <div class="nav-label">メーカー登録</div>
-      </a>
-      <a class="nav-item" th:href="@{/foods/new}">
-        <div class="nav-emoji">🧃</div>
-        <div class="nav-label">食品情報登録</div>
-      </a>
-      <a class="nav-item" th:href="@{/nutritions/new}">
-        <div class="nav-emoji">🧂</div>
-        <div class="nav-label">栄養情報登録</div>
-      </a>
-    </nav>
+	<div class="page">
+		<div class="container">
+			<div class="page-title">食べた！登録</div>
+			<div class="page-sub">③ 分類を選んで「
+				<b>食べた！</b>」を押す</div>
+			<div class="card">
+				<div class="muted">メーカー</div>
+				<div style="font-weight:900;" th:text="${header.makerName}">maker</div>
+				<div class="muted" style="margin-top:6px;">食品</div>
+				<div style="font-weight:900;" th:text="${header.foodName}">food</div>
+				<div class="row" style="margin-top:10px;">
+					<a class="btn btn-ghost tap" th:href="@{/eat/foods(makerId=${header.makerId})}">← 食品選択へ戻る</a>
+					<a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/nutritions/new(foodId=${header.foodId})}">栄養情報登録</a>
+				</div>
+			</div>
+			<div th:if="${error}" class="error" th:text="${error}">
+			</div>
+			<div class="card" th:if="${#lists.isEmpty(nutritions)}">
+				<div class="muted">栄養情報が未登録です</div>
+			</div>
+			<div class="card" th:if="${!#lists.isEmpty(nutritions)}">
+				<div class="muted" style="font-weight:800; margin-bottom:10px;">分類一覧</div>
+				<div class="stack">
+					<div class="card" th:each="fl : ${nutritions}" style="padding:12px;">
+						<div class="row" style="justify-content:space-between; align-items:flex-start;">
+							<div class="stack" style="gap:6px;">
+								<div style="font-weight:900;" th:text="${fl.class_name}">サラダ</div>
+								<div class="muted">
+									<span th:text="${fl.calorie}">0</span>kcal</div>
+							</div>
+							<form th:action="@{/eat/record}" method="post" style="margin:0;">
+								<input type="hidden" name="nutritionId" th:value="${fl.nutrition_id}">
+								<button class="btn btn-primary tap" type="submit">食べた！</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr class="hr">
+			<div class="stack">
+				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
+			</div>
+			<div style="height:72px;">
+			</div>
+		</div>
+	</div>
+	<nav class="bottom-nav">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+			<i class="fa-solid fa-house"></i> Home
+		</a>
+		<a class="nav-item menu-btn" th:href="@{/eat}">
+			<i class="fa-solid fa-utensils"></i> 食べた！
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+			<i class="fa-solid fa-bars"></i> メニュー
+		</a>
+	</nav>
 	<script>
-	// iOS Safariで :active を確実に効かせる
-	document.addEventListener('touchstart', () => {}, {passive:true});
-	//	遷移時アニメーション
-	const kick = () => {
-	const el = document.querySelector(".page");
-	if(!el) return;
-	el.classList.remove("is-ready"); // 再点火用
-	requestAnimationFrame(() => el.classList.add("is-ready"));
-	};
-	document.addEventListener("DOMContentLoaded", kick);
-	// iOS/Safari の戻る(キャッシュ復元)でも再点火
-	window.addEventListener("pageshow", kick);
+		// iOS Safariで :active を確実に効かせる
+		document.addEventListener('touchstart', () => {}, {passive:true});
+		//	遷移時アニメーション
+		const kick = () => {
+		const el = document.querySelector(".page");
+		if(!el) return;
+		el.classList.remove("is-ready"); // 再点火用
+		requestAnimationFrame(() => el.classList.add("is-ready"));
+		};
+		document.addEventListener("DOMContentLoaded", kick);
+		// iOS/Safari の戻る(キャッシュ復元)でも再点火
+		window.addEventListener("pageshow", kick);
 	</script>
 </body>
+
 </html>

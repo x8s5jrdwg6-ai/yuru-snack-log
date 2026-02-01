@@ -68,7 +68,7 @@ public class HomeController {
 	--------------------------------------*/
 	// 初期表示想定
 	// 日付選択時
-	// 「TOPへ戻る」押下時
+	// 「Homeへ戻る」押下時
 	@GetMapping("/")
 	public String home(@RequestParam(name = "date", required = false) String date, Model model,
             HttpServletRequest req,
@@ -415,6 +415,14 @@ public class HomeController {
 		intakeSvc.insIntake(userId, nutritionId);
 		ra.addFlashAttribute("msg", "食べた！を記録しました。");
 		return "redirect:/";
+	}
+	
+	// メニュー押下時
+	@GetMapping("/menu")
+	public String menu(HttpServletRequest req, HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		return "menu";
 	}
 
 }

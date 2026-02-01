@@ -2,108 +2,99 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta charset="UTF-8">
-  <title>ゆるゆる間食ログ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <link rel="stylesheet" th:href="@{/css/base.css}">
-<!--<link rel="stylesheet" th:href="@{/css/base.css(v=${#dates.createNow().time})}">-->
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta charset="UTF-8">
+	<title>ゆるゆる間食ログ</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body>
-  <div class="page">
-    <div class="container">
-      <h1 class="page-title">ゆるゆる間食ログ</h1>
-	  <div class="stack_2">
-	    <a class="btn btn-ghost tap" th:href="@{/info}">お知らせ</a>
-		<a class="btn btn-ghost tap" th:href="@{/howto}">使い方</a>
-	  </div>
-<!--	  <div class="stack" style="flex-direction: column;">-->
-    	
-<!-- 	  </div>-->
-	  
-      <!--  <div class="page-sub">食べすぎないようにしましょう</div>-->
-      <div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;"></div>
-      <!-- 日付ナビ -->
-      <div class="card" style="margin-top:10px;">
-        <div class="row" style="justify-content:space-between;">
-          <a class="btn btn-ghost tap" th:href="@{/(date=${prevDate})}">← 前日</a>
-          <a class="btn btn-ghost tap" th:href="@{/(date=${todayDate})}">本日</a>
-          <a class="btn btn-ghost tap" th:href="@{/(date=${nextDate})}">翌日 →</a>
-        </div>
-        <form th:action="@{/}" method="get" class="row" style="margin-top:10px; display:flex; gap:8px; align-items:stretch;">
-          <input class="input" type="date" name="date" th:value="${targetDate}" style="flex:1;">
-          <button class="btn btn-primary tap" type="submit" style="white-space:nowrap;">表示</button>
-        </form>
-      </div>
-      <!-- 合計 -->
-      <div class="card" style="margin-top:12px;">
-        <div class="muted" style="font-weight:800;">
-          <span th:text="${targetDate}">2026-01-27</span>の合計</div>
-        <div style="font-size:28px; font-weight:900; margin-top:6px;">
-          <span th:text="${totalKcal}">0</span>
-          <span class="muted" style="font-weight:700;">kcal</span>
-        </div>
-      </div>
-      <!-- 履歴 -->
-      <div class="card" style="margin-top:12px;">
-        <div class="muted" style="font-weight:800; margin-bottom:8px;">食べた！履歴</div>
-        <div th:if="${#lists.isEmpty(targetDateAteRecords)}" class="muted">まだ記録がありません</div>
-        <div th:if="${!#lists.isEmpty(targetDateAteRecords)}" class="stack">
-          <div th:each="t : ${targetDateAteRecords}" class="card" style="padding:12px;">
-            <a method="get" class="list-link row tap" style="justify-content:space-between; align-items:flex-start;" th:href="@{/intake/detail(intakeId=${t.intakeId}, date=${forDetailDate})}">
-              <div class="stack" style="gap:6px;">
-                <div class="muted" style="font-weight:800;">
-                  <span th:text="${#strings.substring(t.eatenTime, 0, 5)}">12:34</span>
-                </div>
-                <div style="font-weight:900;">
-                  <span th:text="${t.foodName}">food</span>
-                  <span class="muted">（</span>
-                  <span th:text="${t.className}">class</span>
-                  <span class="muted">）</span>
-                </div>
-                <div class="muted">
-                  <span th:text="${t.kcalTotal()}">0</span>kcal</div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-      <!-- 下固定ナビ（iPhoneっぽさ爆上げ） -->
-      <div style="height:72px;">
-      </div>
-    </div>
-  </div>
-    <nav class="bottom-nav">
-      <a class="nav-item" th:href="@{/eat}">
-        <div class="nav-emoji">🍽</div>
-        <div class="nav-label">食べた！</div>
-      </a>
-      <a class="nav-item" th:href="@{/makers/new}">
-        <div class="nav-emoji">🏭</div>
-        <div class="nav-label">メーカー登録</div>
-      </a>
-      <a class="nav-item" th:href="@{/foods/new}">
-        <div class="nav-emoji">🧃</div>
-        <div class="nav-label">食品情報登録</div>
-      </a>
-      <a class="nav-item" th:href="@{/nutritions/new}">
-        <div class="nav-emoji">🧂</div>
-        <div class="nav-label">栄養情報登録</div>
-      </a>
-    </nav>
-    <script>
-    // iOS Safariで :active を確実に効かせる
-    document.addEventListener('touchstart', () => {}, {passive:true});
-    //	遷移時アニメーション
-    const kick = () => {
-    const el = document.querySelector(".page");
-    if(!el) return;
-    el.classList.remove("is-ready"); // 再点火用
-    requestAnimationFrame(() => el.classList.add("is-ready"));
-    };
-    document.addEventListener("DOMContentLoaded", kick);
-    // iOS/Safari の戻る(キャッシュ復元)でも再点火
-    window.addEventListener("pageshow", kick);
-    </script>
+	<div class="page">
+		<div class="container">
+			<h1 class="page-title">ゆるゆる間食ログ</h1>
+			<div class="stack_2">
+				<a class="btn btn-ghost tap" th:href="@{/info}">お知らせ</a>
+				<a class="btn btn-ghost tap" th:href="@{/howto}">使い方</a>
+			</div>
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
+			</div>
+			<!-- 日付ナビ -->
+			<div class="card" style="margin-top:10px;">
+				<div class="row" style="justify-content:space-between;">
+					<a class="btn btn-ghost tap" th:href="@{/(date=${prevDate})}">← 前日</a>
+					<a class="btn btn-ghost tap" th:href="@{/(date=${todayDate})}">本日</a>
+					<a class="btn btn-ghost tap" th:href="@{/(date=${nextDate})}">翌日 →</a>
+				</div>
+				<form th:action="@{/}" method="get" class="row" style="margin-top:10px; display:flex; gap:8px; align-items:stretch;">
+					<input class="input" type="date" name="date" th:value="${targetDate}" style="flex:1;">
+					<button class="btn btn-primary tap" type="submit" style="white-space:nowrap;">表示</button>
+				</form>
+			</div>
+			<!-- 合計 -->
+			<div class="card" style="margin-top:12px;">
+				<div class="muted" style="font-weight:800;">
+					<span th:text="${targetDate}">2026-01-27</span>の合計</div>
+				<div style="font-size:28px; font-weight:900; margin-top:6px;">
+					<span th:text="${totalKcal}">0</span>
+					<span class="muted" style="font-weight:700;">kcal</span>
+				</div>
+			</div>
+			<!-- 履歴 -->
+			<div class="card" style="margin-top:12px;">
+				<div class="muted" style="font-weight:800; margin-bottom:8px;">食べた！履歴</div>
+				<div th:if="${#lists.isEmpty(targetDateAteRecords)}" class="muted">まだ記録がありません</div>
+				<div th:if="${!#lists.isEmpty(targetDateAteRecords)}" class="stack">
+					<div th:each="t : ${targetDateAteRecords}" class="card" style="padding:12px;">
+						<a method="get" class="list-link row tap" style="justify-content:space-between; align-items:flex-start;" th:href="@{/intake/detail(intakeId=${t.intakeId}, date=${forDetailDate})}">
+							<div class="stack" style="gap:6px;">
+								<div class="muted" style="font-weight:800;">
+									<span th:text="${#strings.substring(t.eatenTime, 0, 5)}">12:34</span>
+								</div>
+								<div style="font-weight:900;">
+									<span th:text="${t.foodName}">food</span>
+									<span class="muted">（</span>
+									<span th:text="${t.className}">class</span>
+									<span class="muted">）</span>
+								</div>
+								<div class="muted">
+									<span th:text="${t.kcalTotal()}">0</span>kcal</div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+			<!-- 下固定ナビ -->
+			<div style="height:72px;">
+			</div>
+		</div>
+	</div>
+	<nav class="bottom-nav">
+		<a class="nav-item menu-btn" th:href="@{/}">
+			<i class="fa-solid fa-house"></i> Home
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+			<i class="fa-solid fa-utensils"></i> 食べた！
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+			<i class="fa-solid fa-bars"></i> メニュー
+		</a>
+	</nav>
+	<script>
+		// iOS Safariで :active を確実に効かせる
+		document.addEventListener('touchstart', () => {}, {passive:true});
+		//	遷移時アニメーション
+		const kick = () => {
+		const el = document.querySelector(".page");
+		if(!el) return;
+		el.classList.remove("is-ready"); // 再点火用
+		requestAnimationFrame(() => el.classList.add("is-ready"));
+		};
+		document.addEventListener("DOMContentLoaded", kick);
+		// iOS/Safari の戻る(キャッシュ復元)でも再点火
+		window.addEventListener("pageshow", kick);
+	</script>
 </body>
+
 </html>
