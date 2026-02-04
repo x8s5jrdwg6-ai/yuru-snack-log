@@ -301,7 +301,7 @@ public class HomeController {
 		
 		// 食品一覧を取得
 		List<Map<String, Object>> foods = jdbc.queryForList(
-				"SELECT food_id, food_name FROM food WHERE regist_user_id=? ORDER BY food_name",
+				"SELECT food_id, food_name FROM food f INNER JOIN maker m ON m.maker_id = f.maker_id WHERE regist_user_id=? ORDER BY food_name",
 				userId
 				);
 
