@@ -21,7 +21,7 @@
 						<div style="font-weight:900;" th:text="${#strings.substring(eatenDatetime, 0, 16)}">2026-01-28 12:34</div>
 					</div>
 					<div class="row" style="margin: 0 0 0 auto;">
-						<a class="btn btn-primary tap" th:href="@{/intake/edit(intakeId=${intakeId}, (date=${targetDate}))}">編集</a>
+						<a class="btn btn-primary tap" th:href="@{/intake/edit(intakeId=${intakeId}, date=${targetDate})}">編集</a>
 						<form th:action="@{/intake/delete}" method="post" style="margin:0;">
 							<input type="hidden" name="intakeId" th:value="${intakeId}">
 							<input type="hidden" name="hiddenDate" th:value="${targetDate}">
@@ -80,7 +80,7 @@
 			<i class="fa-solid fa-house"></i> Home
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
-			<i class="fa-solid fa-utensils"></i> 食べた！
+			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー

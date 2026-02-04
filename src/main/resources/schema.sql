@@ -30,10 +30,10 @@ CREATE TABLE IF NOT EXISTS nutrition (
   class_name    varchar(50) NOT NULL,
   food_id        integer NOT NULL,
   calorie        integer NOT NULL,
-  protein        numeric(10,1),
-  lipid          numeric(10,1),
-  carbo          numeric(10,1),
-  salt           numeric(10,2),
+  protein        numeric(10,1) NOT NULL DEFAULT 0,
+  lipid          numeric(10,1) NOT NULL DEFAULT 0,
+  carbo          numeric(10,1) NOT NULL DEFAULT 0,
+  salt           numeric(10,2) NOT NULL DEFAULT 0,
   regist_user_id varchar(36) NOT NULL,
   UNIQUE (regist_user_id, food_id, class_name)
 );

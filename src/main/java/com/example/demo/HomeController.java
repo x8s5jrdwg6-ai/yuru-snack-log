@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -77,18 +78,31 @@ public class HomeController {
 		String userId = resolveUserId(req, res);
 		// 三項演算子（条件 ? 真のときの値 : 偽のときの値）
 		LocalDate targetDate = (date == null || date.isBlank()) ? LocalDate.now(): LocalDate.parse(date);
+		
+		// 合計カロリー取得
+		int totalKcal = intakeSvc.calcTotalCal(userId, targetDate);
+		// getDailyRecordsで対象日の履歴を取得
+		List<IntakeRow> targetDateAteRecords = intakeSvc.getDailyRecords(userId, targetDate);
+		
+		LocalDate today = LocalDate.now();
+		
 		// modelに格納
 		model.addAttribute("targetDate", targetDate.toString());
-		// 合計カロリー取得
-		model.addAttribute("totalKcal", intakeSvc.calcTotalCal(userId, targetDate));
-		// getDailyRecordsで対象日の履歴を取得
-		model.addAttribute("targetDateAteRecords", intakeSvc.getDailyRecords(userId, targetDate));
+		model.addAttribute("totalKcal", totalKcal);
+		model.addAttribute("targetDateAteRecords", targetDateAteRecords);
 		model.addAttribute("prevDate", targetDate.minusDays(1).toString());
-		model.addAttribute("todayDate", LocalDate.now().toString());
+		model.addAttribute("todayDate", today.toString());
 		model.addAttribute("nextDate", targetDate.plusDays(1).toString());
-		
 		model.addAttribute("forDetailDate", targetDate.toString());
-
+		
+		// 取得した履歴の範囲で乱数を作成
+		int r = intakeSvc.generateRandomIndex(targetDateAteRecords);
+		
+		// ポストのメッセージを設定
+		String postMsg = intakeSvc.getPostMsg(today, targetDate, totalKcal, targetDateAteRecords, r);
+		
+		model.addAttribute("postMessage", postMsg);
+		
 		return "home";
 	}
 	
@@ -228,7 +242,7 @@ public class HomeController {
 		return "eat_nutrition";
 	}
 	
-	// ナビゲーション：メーカー登録押下時
+	// メニュー：メーカー登録押下時
 	@GetMapping("/makers/new")
 	public String makerNew(HttpServletRequest req, HttpServletResponse res) {
 		// user_id取得処理（仮）
@@ -237,7 +251,7 @@ public class HomeController {
 	}
 	
 	
-	// ナビゲーション：食品情報登録押下時
+	// メニュー：食品情報登録押下時
 	@GetMapping("/foods/new")
 	public String foodNew(Model model,
 			@RequestParam(name="makerId", required=false) Long makerId,
@@ -259,7 +273,7 @@ public class HomeController {
 		return "food_new";
 	}
 	
-	// ナビゲーション：栄養情報登録押下時
+	// メニュー：栄養情報登録押下時
 	// 食品情報登録画面：「食品を選択して栄養情報登録へ進む」押下時
 	@GetMapping("/nutritions/new")
 	public String nutritionNew(Model model,
@@ -282,6 +296,157 @@ public class HomeController {
 		return "nutrition_new";
 	}
 	
+	
+	// メニュー押下時
+	@GetMapping("/menu")
+	public String menu(HttpServletRequest req, HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		return "menu";
+	}
+	
+	// メニュー：メーカー一覧押下時
+	@GetMapping("/list/maker")
+	public String listMaker(@RequestParam(name="makerId", required=false) Long makerId,
+			@RequestParam(name="makerName", required=false) String makerName,
+			Model model,HttpServletRequest req, HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		// ユーザーIDに紐づくメーカー一覧を取得
+		List<Map<String, Object>> makers = intakeSvc.getMakerList(userId);
+		
+		model.addAttribute("makers", makers);
+		return "list_maker";
+	}
+	
+	// メーカー一覧：選択時
+	@GetMapping("/edit/maker")
+	public String editMaker(@RequestParam(name="makerId", required=false) Long makerId,
+			@RequestParam(name="makerName", required=false) String makerName,
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		model.addAttribute("makerId", makerId);
+		model.addAttribute("makerName", makerName);
+		
+		return "edit_maker";
+	}
+	
+	// メニュー：食品情報一覧押下
+	@GetMapping("/list/food")
+	public String listFood(
+//			@RequestParam(name="foodId", required=false) Long foodId,
+//			@RequestParam(name="foodName", required=false) String foodName,
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// ユーザーIDと選択したメーカーに紐づく食品一覧を取得
+		List<Map<String, Object>> foods = intakeSvc.getFoodListAll(userId);
+		
+		model.addAttribute("foods", foods);
+		
+//		model.addAttribute("foodId", foodId);
+//		model.addAttribute("foodName", foodName);
+		
+		return "list_food";
+	}
+	
+	// 食品情報一覧：選択時
+	@GetMapping("/edit/food")
+	public String editFood(@RequestParam(name="makerId", required=false) Long makerId,
+			@RequestParam(name="foodId", required=false) Long foodId,
+			@RequestParam(name="foodName", required=false) String foodName,
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		model.addAttribute("makerId", makerId);
+		model.addAttribute("foodId", foodId);
+		model.addAttribute("foodName", foodName);
+		
+		return "edit_food";
+	}
+	
+	// メニュー：食品情報一覧押下
+	@GetMapping("/list/nutrition")
+	public String listNutrition(
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// ユーザーIDと選択したメーカーに紐づく食品一覧を取得
+		List<Map<String, Object>> nutritions = intakeSvc.getNutritionListAll(userId);
+		
+		model.addAttribute("nutritions", nutritions);
+		
+		
+		return "list_nutrition";
+	}
+	
+	// 食品情報一覧：選択時
+	@GetMapping("/nutrition/detail")
+	public String nutritionDetail(@RequestParam(name="nutritionId", required=false) Long nutritionId,
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// ユーザーIDと食品IDに紐づく食品情報とメーカ情報を取得
+		Map<String, Object> nutritionInfo = intakeSvc.getNutritionInfo(userId, nutritionId);
+
+		model.addAttribute("makerId", nutritionInfo.get("makerId").toString());
+		model.addAttribute("foodId", nutritionInfo.get("foodId").toString());
+		model.addAttribute("nutritionId", nutritionId);
+		model.addAttribute("makerName", nutritionInfo.get("makerName").toString());
+		model.addAttribute("foodName", nutritionInfo.get("foodName").toString());
+		model.addAttribute("className", nutritionInfo.get("className").toString());
+		model.addAttribute("calorie", nutritionInfo.get("calorie").toString());
+		model.addAttribute("protein", nutritionInfo.get("protein").toString());
+		model.addAttribute("lipid", nutritionInfo.get("lipid").toString());
+		model.addAttribute("carbo", nutritionInfo.get("carbo").toString());
+		model.addAttribute("salt", nutritionInfo.get("salt").toString());
+		
+		return "nutrition_detail";
+	}
+	
+	// 食品情報詳細：編集押下時
+	@GetMapping("/edit/nutrition")
+	public String editNutrition(@RequestParam(name="nutritionId", required=false) Long nutritionId,
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// ユーザーIDと食品IDに紐づく食品情報とメーカ情報を取得
+		Map<String, Object> nutritionInfo = intakeSvc.getNutritionInfo(userId, nutritionId);
+
+		model.addAttribute("makerId", nutritionInfo.get("makerId").toString());
+		model.addAttribute("foodId", nutritionInfo.get("foodId").toString());
+		model.addAttribute("nutritionId", nutritionId);
+		model.addAttribute("makerName", nutritionInfo.get("makerName").toString());
+		model.addAttribute("foodName", nutritionInfo.get("foodName").toString());
+		model.addAttribute("className", nutritionInfo.get("className").toString());
+		model.addAttribute("calorie", nutritionInfo.get("calorie").toString());
+		model.addAttribute("protein", nutritionInfo.get("protein").toString());
+		model.addAttribute("lipid", nutritionInfo.get("lipid").toString());
+		model.addAttribute("carbo", nutritionInfo.get("carbo").toString());
+		model.addAttribute("salt", nutritionInfo.get("salt").toString());
+		
+		return "edit_nutrition";
+	}
+	
 	/*--------------------------------------
 		詳細画面
 	--------------------------------------*/
@@ -289,12 +454,19 @@ public class HomeController {
 	@PostMapping("/intake/delete")
 	public String delete(@RequestParam("intakeId") long intakeId,
 			@RequestParam("hiddenDate") String hiddenDate,
+			RedirectAttributes ra,
             HttpServletRequest req,
             HttpServletResponse res) {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
 		
-		intakeSvc.delIntake(userId, intakeId);
+		// 削除実行
+		if(intakeSvc.delIntake(userId, intakeId) != 0) {
+			ra.addFlashAttribute("msg", "食べた！履歴を削除しました");
+			return "redirect:/?date=" + hiddenDate;
+		}
+		
+		ra.addFlashAttribute("errorMsg", "削除に失敗しました");
 		return "redirect:/?date=" + hiddenDate;
 	}
 	
@@ -417,12 +589,139 @@ public class HomeController {
 		return "redirect:/";
 	}
 	
-	// メニュー押下時
-	@GetMapping("/menu")
-	public String menu(HttpServletRequest req, HttpServletResponse res) {
+	/*--------------------------------------
+		メーカー編集画面
+	--------------------------------------*/
+	@PostMapping("/edit/maker")
+	public String editMaker(@RequestParam("makerId") long makerId,
+			@RequestParam("makerName") String makerName,
+			@RequestParam(value="deleteFlg", required=false) String  deleteFlg,
+			RedirectAttributes ra,
+            HttpServletRequest req,
+            HttpServletResponse res) {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
-		return "menu";
+		
+		// 削除押下なら削除実行
+		if(deleteFlg.equals("true")) {
+			if(intakeSvc.delMaker(userId, makerId) != 0) {
+				ra.addFlashAttribute("msg", "メーカーを削除しました");
+				return "redirect:/list/maker";
+			}
+			ra.addFlashAttribute("errorMsg", "削除に失敗しました");
+			return "redirect:/list/maker";
+		}
+		
+		// メーカー名必須チェック
+		if(makerName.isEmpty()) {
+			ra.addFlashAttribute("errorMsg", "メーカー名を入力してください");
+			return "redirect:/edit/maker?makerId=" + makerId;
+		}
+		
+		// メーカー重複チェック true：重複なし false：重複あり
+		if(!intakeSvc.chkDepliMaker(userId, makerName)) {
+			ra.addFlashAttribute("errorMsg", "同じメーカーが既に登録されています");
+			return "redirect:/edit/maker?makerId=" + makerId;
+		}
+		
+		// 更新実行
+		if(intakeSvc.updMaker(makerId, makerName) != 0) {
+			ra.addFlashAttribute("msg", "メーカー名を更新しました");
+		}else {
+			ra.addFlashAttribute("errorMsg", "更新に失敗しました");
+		}
+		
+		return "redirect:/list/maker";
 	}
+	
+	/*--------------------------------------
+		食品情報編集画面
+	--------------------------------------*/
+	@PostMapping("/edit/food")
+	public String editFood(@RequestParam("makerId") long makerId,
+			@RequestParam("foodId") long foodId,
+			@RequestParam("foodName") String foodName,
+			@RequestParam(value="deleteFlg", required=false) String  deleteFlg,
+			RedirectAttributes ra,
+            HttpServletRequest req,
+            HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// 削除押下なら削除実行
+		if(deleteFlg.equals("true")) {
+			if(intakeSvc.delFood(userId, foodId) != 0) {
+				ra.addFlashAttribute("msg", "食品情報を削除しました");
+				return "redirect:/list/food";
+			}
+			ra.addFlashAttribute("errorMsg", "削除に失敗しました");
+			return "redirect:/list/food";
+		}
+		
+		// メーカー名必須チェック
+		if(foodName.isEmpty()) {
+			ra.addFlashAttribute("errorMsg", "食品名を入力してください");
+			return "redirect:/edit/food?makerId=" + makerId + "&foodId=" + foodId;
+		}
+		
+		// メーカー重複チェック true：重複なし false：重複あり
+		if(!intakeSvc.chkDepliFood(userId, foodName, makerId)) {
+			ra.addFlashAttribute("errorMsg", "同一メーカーで重複する食品名が既に登録されています");
+			return "redirect:/edit/food?makerId=" + makerId + "&foodId=" + foodId;
+		}
+		
+		// 更新実行
+		if(intakeSvc.updFood(userId, foodId, foodName) != 0) {
+			ra.addFlashAttribute("msg", "食品情報を更新しました");
+		}else {
+			ra.addFlashAttribute("errorMsg", "更新に失敗しました");
+		}
+		
+		return "redirect:/list/food";
+	}
+	
+	/*--------------------------------------
+		栄養情報編集画面
+	--------------------------------------*/
+	@PostMapping("/edit/nutrition")
+	public String editNutrition(@RequestParam("nutritionId") long nutritionId,
+			@RequestParam("className") String className,
+			@RequestParam("calorie") int calorie,
+			@RequestParam(value="protein", required=false) BigDecimal protein,
+			@RequestParam(value="lipid",   required=false) BigDecimal lipid ,
+			@RequestParam(value="carbo",   required=false) BigDecimal carbo ,
+			@RequestParam(value="salt",    required=false) BigDecimal salt,
+			@RequestParam(value="deleteFlg", required=false) String deleteFlg,
+			RedirectAttributes ra,
+            HttpServletRequest req,
+            HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// 削除押下なら削除実行
+		if(deleteFlg.equals("true")) {
+			if(intakeSvc.delNutrition(userId, nutritionId) != 0) {
+				ra.addFlashAttribute("msg", "栄養情報を削除しました");
+				return "redirect:/list/nutrition";
+			}
+			ra.addFlashAttribute("errorMsg", "削除に失敗しました");
+			return "redirect:/list/nutrition";
+		}
+		
+		// 分類名必須チェック
+		if(className.isEmpty()) {
+			ra.addFlashAttribute("errorMsg", "分類名を入力してください");
+			return "redirect:/edit/nutrition?nutritionId=" + nutritionId + "&=calorie" + calorie + "&=protein" +protein + "&=lipid" + lipid + "&=carbo" + carbo + "&=salt" + salt;
 
+		}
+		
+		// 更新実行
+		if(intakeSvc.updNutrition(userId, nutritionId, className, calorie, protein, lipid, carbo, salt) != 0) {
+			ra.addFlashAttribute("msg", "栄養情報を更新しました");
+		}else {
+			ra.addFlashAttribute("errorMsg", "更新に失敗しました");
+		}
+		
+		return "redirect:/list/nutrition";
+	}
 }

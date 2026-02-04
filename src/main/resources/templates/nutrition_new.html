@@ -21,8 +21,8 @@
 			</div>
 			<div th:if="${error}" class="error" th:text="${error}">
 			</div>
-			<div class="card" style="margin-top:10px;">
-				<form th:action="@{/nutritions/create}" method="post" class="stack">
+			<form th:action="@{/nutritions/create}" method="post" class="stack" style="gap: 0px;">
+				<div class="card">
 					<div class="stack">
 						<label>食品</label>
 						<select name="foodId" required>
@@ -30,49 +30,30 @@
 							<option th:each="f : ${foods}" th:value="${f.food_id}" th:text="${f.food_name}" th:selected="${selectedFoodId != null and f.food_id == selectedFoodId}">
 							</option>
 						</select>
-					</div>
-					<div class="stack">
 						<div class="row">
 							<label>分類</label>
 							<label class="muted" style="font-size: 75%; padding-left:10px;">味や内容量ごとの登録がおすすめです</label>
 						</div>
-						<div class="row">
-							<input class="input" type="text" name="className" id="className" required placeholder="例：Lサイズ サラダ味">
-							<!--              <label class="btn" style="white-space:nowrap;">-->
-							<!--                <input type="checkbox" name="plainFlg" value="1" id="plainFlg" style="width:auto; min-height:auto;">プレーン</label>-->
-						</div>
-					</div>
-					<div class="stack">
+						<input class="input" type="text" name="className" id="className" maxlength="50" placeholder="例：Lサイズ サラダ味" required>
 						<label>カロリー(kcal)</label>
-						<input class="input" type="number" name="calorie" min="0" required placeholder="例：333">
+						<input class="input" type="number" name="calorie" min="0" placeholder="例：333" required>
+						<label>たんぱく質(g)</label>
+						<input class="input" type="number" name="protein" step="0.1" max="999999999.9" placeholder="任意 小数点1桁まで入力できます">
+						<label>脂質(g)</label>
+						<input class="input" type="number" name="lipid" step="0.1" max="999999999.9" placeholder="任意 小数点1桁まで入力できます">
+						<label>炭水化物(g)</label>
+						<input class="input" type="number" name="carbo" step="0.1" max="999999999.9" placeholder="任意 小数点1桁まで入力できます">
+						<label>塩分(g)</label>
+						<input class="input" type="number" name="salt" step="0.01" max="999999999.99" placeholder="任意 小数点2桁まで入力できます">
 					</div>
-					<div class="grid-tiles">
-						<div class="stack">
-							<label>たんぱく質(g)</label>
-							<input class="input" type="number" name="protein" step="0.1" placeholder="任意 小数点1桁まで入力できます">
-						</div>
-						<div class="stack" style="padding-top: 10px;">
-							<label>脂質(g)</label>
-							<input class="input" type="number" name="lipid" step="0.1" placeholder="任意 小数点1桁まで入力できます">
-						</div>
-						<div class="stack" style="padding-top: 10px;">
-							<label>炭水化物(g)</label>
-							<input class="input" type="number" name="carbo" step="0.1" placeholder="任意 小数点1桁まで入力できます">
-						</div>
-						<div class="stack" style="padding-top: 10px;">
-							<label>塩分(g)</label>
-							<input class="input" type="number" name="salt" step="0.01" placeholder="任意 小数点2桁まで入力できます">
-						</div>
-					</div>
-					<br>
-					<button class="btn btn-primary tap" type="submit">登録</button>
-				</form>
-			</div>
+				</div>
+				<br>
+				<button class="btn btn-primary tap" type="submit">登録</button>
+			</form>
 			<hr class="hr">
 			<div class="stack">
 				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
 			</div>
-			<!-- 下固定ナビ -->
 			<div style="height:72px;">
 			</div>
 		</div>
@@ -82,7 +63,7 @@
 			<i class="fa-solid fa-house"></i> Home
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
-			<i class="fa-solid fa-utensils"></i> 食べた！
+			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー

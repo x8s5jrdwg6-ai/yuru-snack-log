@@ -13,17 +13,18 @@
 	<div class="page">
 		<div class="container">
 			<div class="page-title">食べた！登録</div>
-			<div class="page-sub">③ 分類を選んで「
-				<b>食べた！</b>」を押す</div>
+			<div class="page-sub">
+				③ 分類を選んで「<b>食べた！</b>」を押す
+			</div>
+			<div class="row" style="margin-top:10px;">
+				<a class="btn btn-ghost tap" style="margin-right: auto;" th:href="@{/eat/foods(makerId=${header.makerId})}">← 食品選択へ戻る</a>
+				<a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/nutritions/new(foodId=${header.foodId})}">栄養情報登録</a>
+			</div>
 			<div class="card">
 				<div class="muted">メーカー</div>
 				<div style="font-weight:900;" th:text="${header.makerName}">maker</div>
 				<div class="muted" style="margin-top:6px;">食品</div>
 				<div style="font-weight:900;" th:text="${header.foodName}">food</div>
-				<div class="row" style="margin-top:10px;">
-					<a class="btn btn-ghost tap" th:href="@{/eat/foods(makerId=${header.makerId})}">← 食品選択へ戻る</a>
-					<a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/nutritions/new(foodId=${header.foodId})}">栄養情報登録</a>
-				</div>
 			</div>
 			<div th:if="${error}" class="error" th:text="${error}">
 			</div>
@@ -61,7 +62,7 @@
 			<i class="fa-solid fa-house"></i> Home
 		</a>
 		<a class="nav-item menu-btn" th:href="@{/eat}">
-			<i class="fa-solid fa-utensils"></i> 食べた！
+			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー

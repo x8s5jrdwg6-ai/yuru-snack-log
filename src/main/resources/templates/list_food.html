@@ -4,7 +4,7 @@
 <head>
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
-	<title>ゆるゆる間食ログ - 食べた！登録：食品情報</title>
+	<title>ゆるゆる間食ログ - 食品情報一覧</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,34 +13,30 @@
 <body>
 	<div class="page">
 		<div class="container">
-			<div class="page-title">食べた！登録</div>
-			<div class="page-sub">② 食品を選択</div>
-			<div class="row" style="margin-top:10px;">
-				<a class="btn btn-ghost tap" style="margin-right: auto;" th:href="@{/eat}">← メーカー選択へ戻る</a>
-				<a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/foods/new(makerId=${makerId})}">食品情報登録</a>
+			<div class="page-title">食品情報一覧</div>
+			<div class="page-sub">タップで編集</div>
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
 			</div>
-			<div class="card">
-				<div class="muted">メーカー</div>
-				<div style="font-size:18px; font-weight:900;" th:text="${makerName}">maker</div>
-<!--				<div class="row" style="margin-top:10px;">-->
-<!--					<a class="btn btn-ghost tap" th:href="@{/eat}">← メーカー選択へ戻る</a>-->
-<!--					<a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/foods/new(makerId=${makerId})}">食品情報登録</a>-->
-<!--				</div>-->
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
 			</div>
 			<div class="card" th:if="${#lists.isEmpty(foods)}">
-				<div class="muted">このメーカーの食品は登録されていません</div>
+				<div class="muted" style="text-align: center;">食品情報が未登録です</div>
+				<div style="margin-top:10px; display: flex; justify-content: center;">
+					<a class="btn btn-primary" th:href="@{/foods/new}">食品情報登録へ</a>
+				</div>
 			</div>
 			<div class="card" th:if="${!#lists.isEmpty(foods)}">
-				<div class="muted" style="font-weight:800; margin-bottom:10px;">食品</div>
-				<div class="grid">
-					<a class="tile tap" th:each="f : ${foods}" th:href="@{/eat/nutritions(foodId=${f.food_id})}">
-						<div class="tile-title" th:text="${f.food_name}">food</div>
+				<div class="muted row" style="font-weight:800; margin-bottom:10px;"><p class="left" style="margin-left: 20px;">食品</p><p class="right" style="font-size: 100%; opacity: 1;">メーカー</p></div>
+				<div class="grid" style="grid-template-columns: 1fr;">
+					<a class="tile tap row " th:each="f : ${foods}" th:href="@{/edit/food(makerId=${f.maker_id}, foodId=${f.food_id},foodName=${f.food_name})}">
+						<div class="tile-title left"  th:text="${f.food_name}">food</div>
+						<div class="tile-title right" th:text="${f.maker_name}">maker</div>
 					</a>
 				</div>
 			</div>
 			<hr class="hr">
 			<div class="stack">
-				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
+				<a class="btn btn-ghost tap" th:href="@{/menu}">戻る</a>
 			</div>
 			<div style="height:72px;">
 			</div>
@@ -50,7 +46,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
@@ -58,7 +54,7 @@
 		</a>
 	</nav>
 	<script>
-	// iOS Safariで :active を確実に効かせる
+		// iOS Safariで :active を確実に効かせる
 		document.addEventListener('touchstart', () => {}, {passive:true});
 		//	遷移時アニメーション
 		const kick = () => {

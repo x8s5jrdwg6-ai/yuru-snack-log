@@ -46,13 +46,6 @@ body {
   padding-bottom: 50px; /* 下ナビ分 */
 }
 
-.container_2 {
-/*  padding: 8px;*/
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-bottom: 100px; /* 下ナビ分 */
-}
-
 /* ==========
    typography
    ========== */
@@ -163,6 +156,12 @@ body {
   gap: 10px;
 }
 
+.grid_2 {
+  display: grid;
+/*  grid-template-columns: 1fr;*/
+  gap: 10px;
+}
+
 /* ==========
    buttons
    ========== */
@@ -225,6 +224,33 @@ label {
 
 .tile-title {
   font-weight: 800;
+}
+
+.left{
+	flex: 1;             /* 余った幅を使う */
+	  min-width: 0;
+/*	  white-space: nowrap;*/
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+}
+
+.right{
+	flex: 0 0 33%;     /* ←ここが固定幅（調整ポイント） */
+/*	white-space: nowrap;*/
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: left;
+	opacity: 0.7;
+	font-size: 75%;
+}
+
+
+.nutrition-row{
+	display: flex;
+	flex-wrap: nowrap;   /* 絶対折り返さない */
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
 }
 
 .tile-sub {
@@ -366,8 +392,27 @@ input[type="time"]::-webkit-date-and-time-value{
   left: 12px;
 /*  font-weight: 900;           太く */
   font-size: 18px;           /* 少し大きく */
-  color: #9ca3af;            /* 濃いグレー（黒すぎない） */
-  
-  
-  
+  color: #9ca3af;  
+}
+
+/* 読み取り専用を“入力欄っぽくない表示”にする */
+.readonly-field{
+	background: transparent;
+	border: none;
+	padding: 0;
+	box-shadow: none;
+	border-radius: 0;
+	color: inherit;
+	font-weight: 800;     /* お好みで */          /* 濃いグレー（黒すぎない） */
+}
+	
+.header-row{
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+	
+.header-row p{
+	 margin: 0; 
 }

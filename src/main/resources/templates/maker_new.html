@@ -26,7 +26,7 @@
 				<form th:action="@{/makers/create-and-next}" method="post" class="stack">
 					<div class="stack">
 						<label>メーカー名</label>
-						<input class="input" type="text" name="makerName" required placeholder="例：Calbee">
+						<input class="input" type="text" name="makerName" maxlength="50" placeholder="例：Calbee" required>
 					</div>
 					<br>
 					<!--          <button class="btn btn-primary tap" type="submit">登録</button>-->
@@ -47,7 +47,7 @@
 			<i class="fa-solid fa-house"></i> Home
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
-			<i class="fa-solid fa-utensils"></i> 食べた！
+			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta charset="UTF-8">
+	<title>ゆるゆる間食ログ - 栄養情報詳細</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<link rel="stylesheet" th:href="@{/css/base.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+	<div class="page">
+		<div class="container">
+			<div class="page-title">栄養情報詳細</div>
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
+			</div>
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
+			</div>
+			<form th:action="@{/edit/nutrition}" method="post" class="stack">
+				<div class="card">
+					<input type="hidden" name="makerId" th:value="${makerId}">
+					<input type="hidden" name="foodId" th:value="${foodId}">
+					<input type="hidden" name="nutritionId" th:value="${nutritionId}">
+					<div class="stack">
+						<div class="row" style="margin: 0 0 0 auto;">
+							<a class="btn btn-primary tap" th:href="@{/edit/nutrition(nutritionId=${nutritionId})}">編集</a>
+								<input type="hidden" name="nutritionId" th:value="${nutritionId}">
+								<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" 
+								onclick="return confirm('この栄養情報を削除しますか？栄養情報を削除すると栄養情報に紐づく食べた！履歴も削除されます。');">削除
+								</button>
+						</div>
+						<label>メーカー</label>
+						<input class="input readonly-field" type="text" name="makerName" th:value="${makerName}" readonly>
+						<label>食品</label>
+						<input class="input readonly-field" type="text" name="foodName" th:value="${foodName}" readonly>
+						<label>分類</label>
+						<input class="input readonly-field" type="text" name="className" th:value="${className}" readonly>
+						<div class="tile" style="margin-top: 12px;">
+							<label>カロリー(kcal)</label>
+							<input class="input readonly-field" type="number" name="calorie" min="0" th:value="${calorie}" readonly>
+						</div>
+						<div class="grid">
+							<div class="tile">
+								<label>たんぱく質(g)</label>
+								<input class="input readonly-field" type="number" name="protein" th:value="${protein}" step="0.1" placeholder="任意 小数点1桁まで入力できます" readonly>
+							</div>
+							<div class="tile">
+								<label>脂質(g)</label>
+								<input class="input readonly-field" type="number" name="lipid" step="0.1" th:value="${lipid}" placeholder="任意 小数点1桁まで入力できます" readonly>
+							</div>
+							<div class="tile">
+								<label>炭水化物(g)</label>
+								<input class="input readonly-field" type="number" name="carbo" step="0.1" th:value="${carbo}" placeholder="任意 小数点1桁まで入力できます" readonly>
+							</div>
+							<div class="tile">
+								<label>塩分(g)</label>
+								<input class="input readonly-field" type="number" name="salt" step="0.01" th:value="${salt}" placeholder="任意 小数点2桁まで入力できます" readonly>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<br>
+<!--				<button class="btn btn-primary tap" type="submit" name="deleteFlg" value="false">更新</button>-->
+<!--				<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" onclick="return confirm('この栄養情報を削除しますか？');">削除</button>-->
+				<hr class="hr">
+				<div class="stack">
+					<a class="btn btn-ghost tap" th:href="@{/list/nutrition}">戻る</a>
+				</div>
+				<div style="height:72px;">
+				</div>
+			</form>
+		</div>
+	</div>
+		<nav class="bottom-nav">
+			<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+				<i class="fa-solid fa-house"></i>Home</a>
+			<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+				<i class="fa-solid fa-utensils"></i>　食べた！</a>
+			<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+				<i class="fa-solid fa-bars"></i>メニュー</a>
+		</nav>
+		<script>
+	// iOS Safariで :active を確実に効かせる
+			document.addEventListener('touchstart', () => {}, {passive:true});
+			//	遷移時アニメーション
+			const kick = () => {
+			const el = document.querySelector(".page");
+			if(!el) return;
+			el.classList.remove("is-ready"); // 再点火用
+			requestAnimationFrame(() => el.classList.add("is-ready"));
+			};
+			document.addEventListener("DOMContentLoaded", kick);
+			// iOS/Safari の戻る(キャッシュ復元)でも再点火
+			window.addEventListener("pageshow", kick);
+		</script>
+
+</body>
+
+</html>

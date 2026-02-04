@@ -33,7 +33,7 @@
 					</div>
 					<div class="stack">
 						<label>食品名</label>
-						<input class="input" type="text" name="foodName" required placeholder="例：じゃがりこ">
+						<input class="input" type="text" name="foodName" maxlength="50" placeholder="例：じゃがりこ" required>
 					</div>
 					<br>
 					<button class="btn btn-primary tap" type="submit">食品情報を登録して栄養情報登録へ進む</button>
@@ -53,7 +53,7 @@
 			<i class="fa-solid fa-house"></i> Home
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
-			<i class="fa-solid fa-utensils"></i> 食べた！
+			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー

@@ -4,55 +4,42 @@
 <head>
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
-	<title>ゆるゆる間食ログ - メニュー</title>
+	<title>ゆるゆる間食ログ - メーカー一覧</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-	<div class="page" style="text-align: center;">
-		<h2 class="page-title">メニュー</h2>
-		<div class="container" style="padding-top: 0; padding-bottom: 0;">
-			<h4 style="margin-bottom: 0;">登録</h4>
-<!--			<p style="opacity: 0.7; font-size: 75%;">登録はここから</p>-->
-			<div class="card" style="margin-top:12px;">
-					<a th:href="@{/makers/new}" class="registlink tap">
-						メーカー登録
-					</a>
-					<a th:href="@{/foods/new}" class="registlink tap">
-						食品情報登録
-					</a>
-					<a th:href="@{/nutritions/new}" class="registlink tap">
-						栄養情報登録
-					</a>
-					<a th:href="@{/eat}" class="registlink tap">
-						食べた！登録
-					</a>
+	<div class="page">
+		<div class="container">
+			<div class="page-title">メーカー一覧</div>
+			<div class="page-sub">タップで編集</div>
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
 			</div>
-		</div>
-		<div class="container" style="padding-top: 0;">
-			<h4 style="margin-bottom: 0;">登録情報一覧</h4>
-<!--			<p style="opacity: 0.7; font-size: 75%;">編集もここから</p>-->
-			<div class="card" style="margin-top:12px;">
-				<a th:href="@{/list/maker}" class="registlink tap">
-					メーカー一覧
-				</a>
-				<a th:href="@{/list/food}" class="registlink tap">
-					食品情報一覧
-				</a>
-				<a th:href="@{/list/nutrition}" class="registlink tap">
-					栄養情報一覧
-				</a>
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
+			</div>
+			<div class="card" th:if="${#lists.isEmpty(makers)}">
+				<div class="muted" style="text-align: center;">メーカーが未登録です</div>
+				<div style="margin-top:10px; display: flex; justify-content: center;">
+					<a class="btn btn-primary" th:href="@{/makers/new}">メーカー登録へ</a>
+				</div>
+			</div>
+			<div class="card" th:if="${!#lists.isEmpty(makers)}">
+				<div class="muted" style="font-weight:800; margin-bottom:10px; margin-left: 20px;">メーカー</div>
+				<div class="grid">
+					<a class="tile tap" th:each="m : ${makers}" th:href="@{/edit/maker(makerId=${m.maker_id},makerName=${m.maker_name})}">
+						<div class="tile-title" th:text="${m.maker_name}">maker</div>
+					</a>
+				</div>
 			</div>
 			<hr class="hr">
 			<div class="stack">
-				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
+				<a class="btn btn-ghost tap" th:href="@{/menu}">戻る</a>
+			</div>
+			<div style="height:72px;">
 			</div>
 		</div>
-		
-	</div>
-	<div style="height:72px;">
 	</div>
 	<nav class="bottom-nav">
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
@@ -61,7 +48,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
-		<a class="nav-item menu-btn" th:href="@{/menu}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー
 		</a>
 	</nav>

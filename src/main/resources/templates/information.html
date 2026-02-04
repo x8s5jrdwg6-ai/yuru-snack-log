@@ -14,15 +14,24 @@
 	<div class="page" style="text-align: center;">
 		<h2 class="page-title">お知らせ</h2>
 		<h4>リリースノート</h4>
-		<div class="container_2" style="padding-bottom: 20px;">
+		<div class="container" style="padding-top: 0; padding-bottom: 20px;">
 			<div class="card" style="margin-top:12px;">
+				<div class="card step" style="margin-top:12px;" data-step="v1.1.0（2026.02.04）">
+					<div>
+						<p>登録情報の一覧画面を追加し、編集・削除機能を実装しました</p>
+						<p>Home画面に本日の合計摂取カロリーをポストするボタンを実装しました</p>
+						<p>内部処理の安定性を向上しました</p>
+						<p>UI周りの調整を行いました</p>
+					</div>
+				</div>
 				<div class="card step" style="margin-top:12px;" data-step="v1.0.0（2026.02.01）">
-					<p>ゆるゆる間食ログを公開しました</p>
+					<div >
+						<p>ゆるゆる間食ログを公開しました</p>	
+					</div>
 				</div>
 			</div>
-		</div>
 		<!--	<h4>既知の不具合情報</h4>-->
-		<!--	<div class="container_2" style="padding-bottom: 20px;">-->
+		<!--	<div class="container" style="padding-bottom: 20px;">-->
 		<!--		<div class="card" style="margin-top:12px;">-->
 		<!--			<div class="card" style="margin-top:12px;">-->
 		<!--				<p><b>食べた！</b>を登録した際、稀に"<b>Whitelabel Error Page</b>"が表示されることがあります。</p>-->
@@ -31,34 +40,35 @@
 		<!--		</div>-->
 		<!--	</div>-->
 		<h4>今後の実装予定</h4>
-		<div class="container_2">
 			<div class="card" style="margin-top:12px;">
 				<div class="card" style="margin-top:12px;">
 					<p>Home画面から1タップで
 						<b>食べた！</b>を記録できる</p>
 					<p>お気に入りショートカット機能</p>
 				</div>
+<!--				<div class="card" style="margin-top:12px;">-->
+<!--					<p>登録したメーカー・食品情報・栄養情報の</p>-->
+<!--					<p>修正削除機能</p>-->
+<!--				</div>-->
 				<div class="card" style="margin-top:12px;">
-					<p>登録したメーカー・食品情報・栄養情報の</p>
-					<p>修正削除機能</p>
+					<p>1日摂取した栄養情報の集計機能の拡充</p>
 				</div>
 				<div class="card" style="margin-top:12px;">
 					<p>メーカー・食品情報のソート機能</p>
 				</div>
 			</div>
-			<hr class="hr">
-			<div class="stack">
-				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
-			</div>
-			<div style="padding-top: 10px;">
-				<p>ゆるゆる間食ログ - v1.0.0</p>
-				<p>developed by
-					<a href="https://x.com/nolotgsv" style="color: inherit; text-decoration: none;">
-						<b>のる@nolotgsv</b>
-					</a>
+		</div>
+		<div style="padding-top: 10px;  padding-bottom: 10px;">
+			<p>ゆるゆる間食ログ - v1.1.0</p>
+			<p>developed by
+				<a href="https://x.com/nolotgsv" style="color: inherit; text-decoration: none;">
+					<b>のる@nolotgsv</b>
+				</a>
 				</p>
-			</div>
-			
+		</div>
+		<hr class="hr">
+		<div class="stack" style=" padding-bottom: 125px;">
+			<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
 		</div>
 	</div>
 	<nav class="bottom-nav">
@@ -66,7 +76,7 @@
 			<i class="fa-solid fa-house"></i> Home
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
-			<i class="fa-solid fa-utensils"></i> 食べた！
+			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
 			<i class="fa-solid fa-bars"></i> メニュー

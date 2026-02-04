@@ -4,44 +4,39 @@
 <head>
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
-	<title>ゆるゆる間食ログ - 使い方</title>
+	<title>ゆるゆる間食ログ - 栄養情報一覧</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-	<div class="page" style="text-align: center;">
-		<h2 class="page-title">使い方</h2>
-		<div class="container" style="padding-top: 0;">
-			<div class="card" style="margin-top:12px;">
-				<div class="card step" style="margin-top:12px;" data-step="1">
-					<p>画面下のナビゲーションバーからメニュー画面を開いて「メーカー登録」を行います</p>
+	<div class="page">
+		<div class="container">
+			<div class="page-title">栄養情報一覧</div>
+			<div class="page-sub">タップで詳細</div>
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
+			</div>
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
+			</div>
+			<div class="card" th:if="${#lists.isEmpty(nutritions)}">
+				<div class="muted" style="text-align: center;">栄養情報が未登録です</div>
+				<div style="margin-top:10px; display: flex; justify-content: center;">
+					<a class="btn btn-primary" th:href="@{/nutritions/new}">栄養情報登録へ</a>
 				</div>
-				<div class="card step" style="margin-top:12px;" data-step="2">
-					<p>続いて食品情報を登録します</p>
-				</div>
-				<div class="card step" style="margin-top:12px;" data-step="3">
-					<p>最後に栄養情報を登録します</p>
-				</div>
-				<div class="card step" style="margin-top:12px;" data-step="4">
-					<p>ナビゲーションバー中央の「
-						<b>食べた！</b>」からメーカーと食品を選択し、「
-						<b>食べた！</b>」ボタンを押します</p>
-				</div>
-				<div class="card step" style="margin-top:12px;" data-step="5">
-					<p>食べた食品のカロリーが記録されます</p>
-				</div>
-				<div class="card step" style="margin-top:12px;" data-step="6">
-					<p>摂取カロリーを気軽に管理できるため、</p>
-					<p style="text-align: center; font-size: 150%;">
-						<b>痩せます</b>
-					</p>
+			</div>
+			<div class="card" th:if="${!#lists.isEmpty(nutritions)}">
+				<div class="muted row" style="font-weight:800; margin-bottom:10px;"><p class="left" style="margin-left: 20px;">分類名</p><p class="right" style="font-size: 100%; opacity: 1;">食品（メーカー）</p></div>
+				<div class="grid" style="grid-template-columns: 1fr;">
+					<a class="tile tap row nutrition-row" th:each="n : ${nutritions}" th:href="@{/nutrition/detail(nutritionId=${n.nutrition_id})}">
+						<div class="tile-title left" th:text="${n.class_name}">class</div>
+						<div class="tile-title right" th:text="${n.food_name} + '（' + ${n.maker_name} + '）'">maker：food</div>
+					</a>
 				</div>
 			</div>
 			<hr class="hr">
 			<div class="stack">
-				<a class="btn btn-ghost tap" th:href="@{/}">Homeへ戻る</a>
+				<a class="btn btn-ghost tap" th:href="@{/menu}">戻る</a>
 			</div>
 			<div style="height:72px;">
 			</div>
