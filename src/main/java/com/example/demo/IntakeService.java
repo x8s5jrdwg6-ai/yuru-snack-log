@@ -28,6 +28,10 @@ public class IntakeService {
 		this.intakeRepo = intakeRepo;
 	}
 	
+	public List<Map<String, Object>> getFavoriteList(String userId){
+		return intakeRepo.getFavoriteList(userId);
+	}
+	
 	public List<IntakeRow> getDailyRecords(String userId, LocalDate date) {
 		return intakeRepo.getDailyRecords(userId, date);
 	}
@@ -66,6 +70,14 @@ public class IntakeService {
 	public boolean chkDepliFood(String userId, String foodName, long makerId) {
 		//重複チェック
 		if(intakeRepo.chkDepliFood(userId, foodName, makerId)) {
+			return false;	// エラー
+		}
+		return true;
+	}
+	
+	public boolean chkDepliFood(String userId, String foodName, long makerId, long foodId) {
+		//重複チェック
+		if(intakeRepo.chkDepliFood(userId, foodName, makerId, foodId)) {
 			return false;	// エラー
 		}
 		return true;
@@ -233,5 +245,21 @@ public class IntakeService {
 		message += "https://yuru-snack-log.onrender.com/\n"+ "#ゆるゆる間食ログ";
 		
 		return URLEncoder.encode(message, StandardCharsets.UTF_8);
+	}
+	
+	public int insFavorite(String userId, long nutritionId) {
+		return intakeRepo.insFavorite(userId, nutritionId);
+	}
+	
+	public int delFavorite(String userId, long nutritionId) {
+		return intakeRepo.delFavorite(userId, nutritionId);
+	}
+	
+	public void swapFavorite(String userId, long favoriteId, String direction) {
+		intakeRepo.swapFavorite(userId, favoriteId, direction);
+	}
+	
+	public boolean chkDepliNutritionUpd(String userId, String className, long foodId, long nutritionId) {
+		return intakeRepo.chkDepliNutritionUpd(userId, className, foodId, nutritionId);
 	}
 }

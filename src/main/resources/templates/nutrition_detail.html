@@ -6,8 +6,10 @@
 	<meta charset="UTF-8">
 	<title>ゆるゆる間食ログ - 栄養情報詳細</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">
+<!--	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">-->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet"
+	      th:href="@{/css/base.css(v=${#dates.createNow().time})}">
 </head>
 
 <body>
@@ -24,12 +26,18 @@
 					<input type="hidden" name="foodId" th:value="${foodId}">
 					<input type="hidden" name="nutritionId" th:value="${nutritionId}">
 					<div class="stack">
-						<div class="row" style="margin: 0 0 0 auto;">
+						<div class="row">
+							<button th:if="${favoriteId == '0'}" type="submit" name="favoriteFlg" value="true" class="button05 tap" style="margin-right: auto;">
+								<i class="fa-regular fa-star fav-star"></i>
+							</button>
+							<button th:if="${favoriteId != '0'}" type="submit" name="favoriteFlg" value="false" class="button05 tap" style="margin-right: auto;">
+								<i class="fa-solid fa-star fav-star is-on"></i>
+							</button>
 							<a class="btn btn-primary tap" th:href="@{/edit/nutrition(nutritionId=${nutritionId})}">編集</a>
-								<input type="hidden" name="nutritionId" th:value="${nutritionId}">
-								<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" 
-								onclick="return confirm('この栄養情報を削除しますか？栄養情報を削除すると栄養情報に紐づく食べた！履歴も削除されます。');">削除
-								</button>
+							<input type="hidden" name="nutritionId" th:value="${nutritionId}">
+							<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" 
+							onclick="return confirm('この栄養情報を削除しますか？栄養情報を削除すると栄養情報に紐づく食べた！履歴も削除されます。');">削除
+							</button>
 						</div>
 						<label>メーカー</label>
 						<input class="input readonly-field" type="text" name="makerName" th:value="${makerName}" readonly>

@@ -54,6 +54,68 @@ public class IntakeRepository {
 	
 	/*
 	 * 	初期表示
+	 * 	お気に入りの取得を行うメソッド
+	 *	@param	userId ユーザーID  
+	 *	@return	List<Map<String, Object>>
+	 */
+	public List<Map<String, Object>> getFavoriteList(String userId){
+		String sql = """
+				SELECT f.food_name, n.class_name, fav.favorite_id, n.nutrition_id
+				FROM favorite fav
+				INNER JOIN nutrition n 
+					ON fav.nutrition_id = n.nutrition_id
+				INNER JOIN food f
+					ON n.food_id = f.food_id
+				INNER JOIN maker m
+					ON f.maker_id = m.maker_id
+				WHERE fav.regist_user_id = ?
+				ORDER BY fav.sort_order ASC, fav.favorite_id ASC
+			""";
+		
+		return jdbc.queryForList(sql, userId);
+	}
+	
+	/*
+	 * 	初期表示
+	 * 	お気に入りのソート順を更新するメソッド
+	 *	@param	userId ユーザーID  
+	 *	@param	favoriteId	お気に入りID
+	 *	@param	direction	UP or DOWN
+	 *	@return	List<Map<String, Object>>
+	 */
+	public void swapFavorite(String userId, long favoriteId, String direction) {
+		String sql = """
+					SELECT sort_order
+				FROM favorite
+				WHERE favorite_id = ?
+					AND regist_user_id = ?;
+			""";
+		int currentOrder = jdbc.queryForObject(sql, Integer.class, favoriteId, userId);
+		
+		int targetOrder;
+
+		if ("UP".equals(direction)) {
+		    targetOrder = currentOrder - 1;
+		} else { // DOWN
+		    targetOrder = currentOrder + 1;
+		}
+		
+		String sql_2 = """
+					UPDATE favorite
+					SET sort_order = CASE
+						WHEN sort_order = ? THEN ?
+						WHEN sort_order = ? THEN ?
+					END
+					WHERE regist_user_id = ?
+						AND sort_order IN (?, ?)
+				""";
+			
+		jdbc.update(sql_2, currentOrder, targetOrder, targetOrder, currentOrder, userId, currentOrder, targetOrder);
+	}
+	
+	
+	/*
+	 * 	初期表示
 	 * 	対象日の履歴の取得を行うメソッド
 	 *	@param	userId ユーザーID  
 	 *	@param	eatenDate 食べた日付
@@ -364,7 +426,7 @@ public class IntakeRepository {
 	 *	@param	userId ユーザーID 
 	 * 	@param	foodName	登録する食品名
 	 * 	@param	makerId	メーカーID
-	 *	@return	重複がなければ0。重複がある場合は重複件数
+	 *	@return	重複がなければfalse。重複がある場合はtrue
 	 */
 	public boolean chkDepliFood(String userId, String foodName, long makerId) {
 		String sql = """
@@ -561,6 +623,32 @@ public class IntakeRepository {
 	}
 	
 	/*
+	 * 	「食品を登録して栄養情報登録へ進む」押下
+	 * 	ユーザーごとに食品名の重複チェックを行うメソッド
+	 *	@param	userId ユーザーID 
+	 * 	@param	foodName	登録する食品名
+	 * 	@param	makerId	メーカーID
+	 * 	@param	foodId	食品ID
+	 *	@return	重複がなければfalse。重複がある場合はtrue
+	 */
+	public boolean chkDepliFood(String userId, String foodName, long makerId, long foodId) {
+		String sql = """
+				SELECT EXISTS(
+					SELECT 1
+					FROM food f
+					INNER JOIN maker m
+						ON m.maker_id = f.maker_id
+					WHERE f.regist_user_id = ?
+						AND food_name = ?
+						AND f.maker_id = ?
+						AND f.food_id <> ?
+				)
+			""";
+		// 重複があればtrue、なければfalseを返す
+		return jdbc.queryForObject(sql, Boolean.class, userId, foodName, makerId, foodId);
+	}
+	
+	/*
 	 * 	食品情報の更新を行うメソッド
 	 *	@param	userId user_id
 	 *	@param	makerId	メーカーID
@@ -622,13 +710,15 @@ public class IntakeRepository {
 	 */
 	public Map<String, Object> getNutritionInfo (String userId, long nutritionId) {
 		String sql = """
-				SELECT nutrition_id, class_name, calorie, protein, lipid, carbo, salt, m.maker_id, maker_name, f.food_id, food_name
+				SELECT n.nutrition_id, class_name, calorie, protein, lipid, carbo, salt, m.maker_id, maker_name, f.food_id, food_name, COALESCE(fav.favorite_id, 0) AS favorite_id
 				FROM nutrition n
 				INNER JOIN food f
 					ON f.food_id = n.food_id
 				INNER JOIN maker m
 					ON m.maker_id = f.maker_id
-				WHERE nutrition_id = ?
+				LEFT JOIN favorite fav
+					ON	fav.nutrition_id = n.nutrition_id
+				WHERE n.nutrition_id = ?
 					AND f.regist_user_id = ?
 			""";
 		
@@ -648,6 +738,7 @@ public class IntakeRepository {
 			        map.put("foodName", rs.getString("food_name"));
 			        map.put("makerId", rs.getString("maker_id"));
 			        map.put("makerName", rs.getString("maker_name"));
+			        map.put("favoriteId", rs.getString("favorite_id"));
 			        return map;
 			    }
 			);
@@ -656,8 +747,94 @@ public class IntakeRepository {
 	
 	
 	/*--------------------------------------
+		栄養情報詳細画面
+	--------------------------------------*/
+	/*
+	 * 	栄養情報のお気に入り登録を行うメソッド
+	 *	@param	userId user_id
+	 *	@param	nutritionId	栄養ID
+	 *	@return	登録件数（通常は1）
+	 */
+	public int insFavorite(String userId, long nutritionId) {
+		String sql = """
+				INSERT INTO favorite (regist_user_id, nutrition_id, sort_order)
+				VALUES (?, ?, COALESCE((SELECT MAX(sort_order) + 1 FROM favorite WHERE regist_user_id = ?),1))
+				ON CONFLICT (regist_user_id, nutrition_id) DO NOTHING
+		     """;
+		// 登録件数を返す（通常 1）。失敗時は例外が投げられることが多い
+		return jdbc.update(sql, userId, nutritionId, userId);
+	}
+	
+	
+	/*
+	 * 	栄養情報のお気に入りを削除するメソッド
+	 *	@param	userId user_id
+	 *	@param	nutritionId	栄養ID
+	 *	@return	削除件数（通常は1）
+	 */
+	public int delFavorite(String userId, long nutritionId) {
+		// ① 削除対象の sort_order を取得
+		String sql = """
+				SELECT sort_order
+				FROM favorite
+				WHERE regist_user_id = ?
+					AND nutrition_id = ?
+			""";
+		Integer order = jdbc.queryForObject(sql, Integer.class, userId, nutritionId);
+		
+		if (order == null) {
+			return 0; // そもそも存在しない
+		}
+		
+		// ② 削除
+		String sql_2 = """
+				DELETE FROM favorite
+				WHERE regist_user_id = ?
+					AND nutrition_id = ?
+			""";
+		// 削除件数を返す（通常 1）。失敗時は例外が投げられることが多い
+		int delCnt = jdbc.update(sql_2, userId, nutritionId);
+		
+		// ③ 後ろを詰める
+		String sql_3 = """
+				UPDATE favorite
+				SET sort_order = sort_order - 1
+				WHERE regist_user_id = ?
+					AND sort_order > ?
+			""";
+		jdbc.update(sql_3, userId, order);
+		
+		return delCnt;
+	}
+	
+	
+	
+	/*--------------------------------------
 		栄養情報編集画面
 	--------------------------------------*/
+	/*
+	 * 	「更新」押下
+	 * 	ユーザーごとに分類名の重複チェックを行うメソッド
+	 *	@param	userId ユーザーID 
+	 * 	@param	className	登録する分類名
+	 * 	@param	foodId	食品ID
+	 *  @param	nutritionId	栄養ID
+	 *	@return	重複がなければ0。重複がある場合は重複件数
+	 */
+	public boolean chkDepliNutritionUpd(String userId, String className, long foodId, long nutritionId) {
+		String sql = """
+				SELECT EXISTS(
+					SELECT 1
+				FROM nutrition
+				WHERE regist_user_id = ?
+					AND class_name = ?
+					AND food_id = ?
+					AND nutrition_id <> ?
+				)
+			""";
+		// 重複があればtrue、なければfalseを返す
+		return jdbc.queryForObject(sql, Boolean.class, userId, className, foodId, nutritionId);
+	}
 	/*
 	 * 	栄養情報の更新を行うメソッド
 	 *	@param	userId user_id
@@ -673,7 +850,7 @@ public class IntakeRepository {
 	public int updNutrition(String userId, long nutritionId, String className, int calorie, BigDecimal protein, BigDecimal lipid , BigDecimal carbo , BigDecimal salt) {
 		String sql = """
 				UPDATE nutrition
-				SET class_name = ?, calorie = ?, protein = COALESCE(?, 0), lipid = COALESCE(?, 0), carbo = COALESCE(?, 0), salt = COALESCE(?, 0)
+				SET class_name = ?, calorie = ?, protein = COALESCE(?, 0.0), lipid = COALESCE(?, 0.0), carbo = COALESCE(?, 0.0), salt = COALESCE(?, 0.00)
 				WHERE regist_user_id = ?
 					AND nutrition_id = ?
 			""";

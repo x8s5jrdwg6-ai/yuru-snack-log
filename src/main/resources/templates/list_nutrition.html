@@ -25,20 +25,36 @@
 					<a class="btn btn-primary" th:href="@{/nutritions/new}">栄養情報登録へ</a>
 				</div>
 			</div>
+<!--			<form class="search-box" th:action="@{/list/nutrition}" method="get">-->
+<!--			  <input class="search-input"-->
+<!--			         type="search"-->
+<!--			         name="q"-->
+<!--			         placeholder="食品名で検索"-->
+<!--			         th:value="${q}">-->
+<!--			  <button class="search-btn" type="submit">検索</button>-->
+
+<!--			  <a class="search-clear"-->
+<!--			     th:if="${q != null and !#strings.isEmpty(q)}"-->
+<!--			     th:href="@{/list/nutrition}">クリア</a>-->
+<!--			</form>-->
 			<div class="card" th:if="${!#lists.isEmpty(nutritions)}">
-				<div class="muted row" style="font-weight:800; margin-bottom:10px;"><p class="left" style="margin-left: 20px;">分類名</p><p class="right" style="font-size: 100%; opacity: 1;">食品（メーカー）</p></div>
-				<div class="grid" style="grid-template-columns: 1fr;">
-					<a class="tile tap row nutrition-row" th:each="n : ${nutritions}" th:href="@{/nutrition/detail(nutritionId=${n.nutrition_id})}">
-						<div class="tile-title left" th:text="${n.class_name}">class</div>
-						<div class="tile-title right" th:text="${n.food_name} + '（' + ${n.maker_name} + '）'">maker：food</div>
+				<div class="muted" style=" font-weight:800; margin-bottom:10px;">
+					<p class="left" style="display: flex; justify-content: center; margin-top: 0; margin-bottom: 0;">食品名</p>
+					<p class="right" style="display: flex; justify-content: center; margin-top: 0; margin-bottom: 0;">分類（メーカー）</p>
+				</div>
+				<div class="card list-link tap" th:each="n : ${nutritions}">
+					<a class="list-link tap" th:href="@{/nutrition/detail(nutritionId=${n.nutrition_id})}">
+						<p class="tile-title left font-weight:900; center; margin-top: 0; margin-bottom: 0;" th:text="${n.food_name}">class</p>
+						<p class="tile-title right muted center; margin-top: 0; margin-bottom: 0;" th:text="${n.class_name} + '（' + ${n.maker_name} + '）'">maker：food</p>
 					</a>
+				</div>
 				</div>
 			</div>
 			<hr class="hr">
 			<div class="stack">
 				<a class="btn btn-ghost tap" th:href="@{/menu}">戻る</a>
 			</div>
-			<div style="height:72px;">
+			<div style="height:120px;">
 			</div>
 		</div>
 	</div>

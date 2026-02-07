@@ -78,6 +78,48 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,.05);
 }
 
+
+.fav-acc{
+  background:#fff;
+  border-radius:14px;
+  padding: 0;
+  margin-top:12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.05);
+  overflow: hidden; /* 中身がはみ出さない */
+}
+
+.fav-acc__head{
+  list-style: none;      /* デフォの三角を消す */
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 14px;
+  cursor:pointer;
+  user-select:none;
+  font-weight: 800;
+  color:#6b7280;
+}
+
+/* Safari対策：デフォのマーカーを消す */
+.fav-acc__head::-webkit-details-marker{ display:none; }
+
+.fav-acc__icon{
+  transition: transform .15s ease;
+  opacity: .6;
+}
+
+/* 開いてるとき矢印回転 */
+.fav-acc[open] .fav-acc__icon{
+  transform: rotate(180deg);
+}
+
+/* 中身側の余白 */
+.fav-acc .favorite-row{
+  padding: 10px 14px 14px;
+}
+
+
 .registlink{
   background: #ffffff;
   border-radius: 14px;
@@ -411,8 +453,77 @@ input[type="time"]::-webkit-date-and-time-value{
   grid-template-columns: 120px 1fr;
   gap: 12px;
   align-items: center;
+
 }
 	
 .header-row p{
 	 margin: 0; 
 }
+
+
+/* お気に入り関連ここから */
+.button05{
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: black;
+  font-size: clamp(20px, 6vw, 28px);
+	
+  /* 押しやすい“器” */
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  line-height: 1;          /* ☆の上下ズレ防止 */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button05:hover{
+  transform: scale(0.9);
+}
+
+.fav-star {
+  font-size: clamp(20px, 6vw, 28px);
+  color: #bbb;                 /* 未登録 */
+/*  transition: transform .15s ease, color .15s ease;*/
+}
+
+.fav-star.is-on {
+  color: gold;                 /* 登録後 */
+}
+
+.fav-star:active {
+  transform: scale(0.9);
+}
+
+.move-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f2f2f2;
+  color: #555;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background .15s ease, transform .1s ease;
+}
+
+.move-btn:active {
+  background: #e0e0e0;
+  transform: scale(0.95);
+}
+
+.move-btn:hover {
+  background: #e8e8e8;
+}
+/*ここまで*/

@@ -52,3 +52,12 @@ CREATE TABLE IF NOT EXISTS intake (
 
 CREATE INDEX IF NOT EXISTS idx_intake_user_time ON intake(regist_user_id, eaten_date, eaten_time);
 CREATE INDEX IF NOT EXISTS idx_intake_nutrition ON intake(nutrition_id);
+
+CREATE TABLE IF NOT EXISTS favorite (
+    favorite_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    regist_user_id varchar(36) NOT NULL,
+    nutrition_id integer NOT NULL,
+    sort_order integer NOT NULL DEFAULT 0,
+    regist_date timestamp DEFAULT now(),
+    UNIQUE (regist_user_id, nutrition_id)
+);

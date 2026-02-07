@@ -16,11 +16,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 
 @Controller
@@ -48,13 +50,19 @@ public class HomeController {
 	@ControllerAdvice
 	public class CommonModelAdvice {
 
-	    @Value("${app.version:dev}")
-	    private String appVersion;
+		@Value("${app.version:dev}")
+		private String appVersion;
 
-	    @ModelAttribute("appVersion")
-	    public String appVersion() {
-	        return appVersion;
-	    }
+		@ModelAttribute("appVersion")
+		public String appVersion() {
+			return appVersion;
+		}
+	    
+		@ExceptionHandler(Exception.class)
+		public String handle(Exception e, Model model) {
+			model.addAttribute("message", e.getMessage());
+			return "error"; // templates/error.html を用意
+		}
 	}
 	
 	// ユーザーIDの取得・登録処理を行う
@@ -98,10 +106,14 @@ public class HomeController {
 		
 		// 合計カロリー取得
 		int totalKcal = intakeSvc.calcTotalCal(userId, targetDate);
+		
 		// getDailyRecordsで対象日の履歴を取得
 		List<IntakeRow> targetDateAteRecords = intakeSvc.getDailyRecords(userId, targetDate);
 		
 		LocalDate today = LocalDate.now();
+		
+		// お気に入りのリストを取得
+		List<Map<String, Object>> getFavoriteList = intakeSvc.getFavoriteList(userId);
 		
 		// modelに格納
 		model.addAttribute("targetDate", targetDate.toString());
@@ -111,6 +123,7 @@ public class HomeController {
 		model.addAttribute("todayDate", today.toString());
 		model.addAttribute("nextDate", targetDate.plusDays(1).toString());
 		model.addAttribute("forDetailDate", targetDate.toString());
+		model.addAttribute("favoriteList", getFavoriteList);
 		
 		// 取得した履歴の範囲で乱数を作成
 		int r = intakeSvc.generateRandomIndex(targetDateAteRecords);
@@ -433,6 +446,7 @@ public class HomeController {
 		model.addAttribute("lipid", nutritionInfo.get("lipid").toString());
 		model.addAttribute("carbo", nutritionInfo.get("carbo").toString());
 		model.addAttribute("salt", nutritionInfo.get("salt").toString());
+		model.addAttribute("favoriteId", nutritionInfo.get("favoriteId").toString());	// 0なら未登録
 		
 		return "nutrition_detail";
 	}
@@ -462,6 +476,24 @@ public class HomeController {
 		model.addAttribute("salt", nutritionInfo.get("salt").toString());
 		
 		return "edit_nutrition";
+	}
+	
+	/*--------------------------------------
+		Home画面
+	--------------------------------------*/
+	//	「↑」「↓」押下時
+	@PostMapping("/swap/favorite")
+	public String swapFavorite(@RequestParam("favoriteId") long favoriteId,
+			@RequestParam String direction,
+			RedirectAttributes ra,
+            HttpServletRequest req,
+            HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		intakeSvc.swapFavorite(userId, favoriteId, direction);
+		
+		return "redirect:/";
 	}
 	
 	/*--------------------------------------
@@ -682,8 +714,8 @@ public class HomeController {
 		}
 		
 		// メーカー重複チェック true：重複なし false：重複あり
-		if(!intakeSvc.chkDepliFood(userId, foodName, makerId)) {
-			ra.addFlashAttribute("errorMsg", "同一メーカーで重複する食品名が既に登録されています");
+		if(!intakeSvc.chkDepliFood(userId, foodName, makerId, foodId)) {
+			ra.addFlashAttribute("errorMsg", "同じメーカー内に同名の食品が既に登録されています");
 			return "redirect:/edit/food?makerId=" + makerId + "&foodId=" + foodId;
 		}
 		
@@ -702,18 +734,41 @@ public class HomeController {
 	--------------------------------------*/
 	@PostMapping("/edit/nutrition")
 	public String editNutrition(@RequestParam("nutritionId") long nutritionId,
+			@RequestParam("foodId") long foodId,
 			@RequestParam("className") String className,
 			@RequestParam("calorie") int calorie,
 			@RequestParam(value="protein", required=false) BigDecimal protein,
 			@RequestParam(value="lipid",   required=false) BigDecimal lipid ,
 			@RequestParam(value="carbo",   required=false) BigDecimal carbo ,
 			@RequestParam(value="salt",    required=false) BigDecimal salt,
+			@RequestParam(value="favoriteFlg", required=false) String favoriteFlg,
 			@RequestParam(value="deleteFlg", required=false) String deleteFlg,
 			RedirectAttributes ra,
             HttpServletRequest req,
             HttpServletResponse res) {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
+		
+		if(favoriteFlg != null) {
+			// ☆押下なら削除実行
+			if(favoriteFlg.equals("true")) {
+				// お気に入り登録
+				if(intakeSvc.insFavorite(userId, nutritionId) != 0) {
+					ra.addFlashAttribute("msg", "お気に入りに登録しました");
+					return "redirect:/nutrition/detail?nutritionId=" + nutritionId;
+				}
+				ra.addFlashAttribute("errorMsg", "エラー");
+				return "redirect:/nutrition/detail?nutritionId=" + nutritionId;
+			}else if(favoriteFlg.equals("false")) {
+				// お気に入り削除
+				if(intakeSvc.delFavorite(userId, nutritionId) != 0) {
+					ra.addFlashAttribute("msg", "お気に入りを解除しました");
+					return "redirect:/nutrition/detail?nutritionId=" + nutritionId;
+				}
+				ra.addFlashAttribute("errorMsg", "エラー");
+				return "redirect:/nutrition/detail?nutritionId=" + nutritionId;
+			}
+		}
 		
 		// 削除押下なら削除実行
 		if(deleteFlg.equals("true")) {
@@ -728,8 +783,14 @@ public class HomeController {
 		// 分類名必須チェック
 		if(className.isEmpty()) {
 			ra.addFlashAttribute("errorMsg", "分類名を入力してください");
-			return "redirect:/edit/nutrition?nutritionId=" + nutritionId + "&=calorie" + calorie + "&=protein" +protein + "&=lipid" + lipid + "&=carbo" + carbo + "&=salt" + salt;
-
+			return "redirect:/edit/nutrition?nutritionId=" + nutritionId;
+			
+		}
+		
+		// 重複チェック
+		if(intakeSvc.chkDepliNutritionUpd(userId, className, foodId, nutritionId)) {
+			ra.addFlashAttribute("errorMsg", "同じメーカー・食品で分類が重複しています");
+			return "redirect:/edit/nutrition?nutritionId=" + nutritionId;
 		}
 		
 		// 更新実行
