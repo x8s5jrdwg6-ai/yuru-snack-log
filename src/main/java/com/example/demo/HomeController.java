@@ -314,13 +314,17 @@ public class HomeController {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
 		
+		// メーカー一覧を」取得
+		List<Map<String, Object>> makers = intakeSvc.getMakerList(userId);
+		
 		// 食品一覧を取得
 		List<Map<String, Object>> foods = jdbc.queryForList(
-				"SELECT food_id, food_name FROM food f INNER JOIN maker m ON m.maker_id = f.maker_id WHERE f.regist_user_id=? ORDER BY food_name",
+				"SELECT food_id, food_name, f.maker_id FROM food f INNER JOIN maker m ON m.maker_id = f.maker_id WHERE f.regist_user_id=? ORDER BY food_name",
 				userId
 				);
 
 		model.addAttribute("foods", foods);
+		model.addAttribute("makers", makers);
 		model.addAttribute("selectedFoodId", foodId); // 初期選択用
 		model.addAttribute("error", error);
 		return "nutrition_new";
@@ -368,8 +372,6 @@ public class HomeController {
 	// メニュー：食品情報一覧押下
 	@GetMapping("/list/food")
 	public String listFood(
-//			@RequestParam(name="foodId", required=false) Long foodId,
-//			@RequestParam(name="foodName", required=false) String foodName,
 			Model model,
 			HttpServletRequest req,
 			HttpServletResponse res) {
@@ -380,9 +382,6 @@ public class HomeController {
 		List<Map<String, Object>> foods = intakeSvc.getFoodListAll(userId);
 		
 		model.addAttribute("foods", foods);
-		
-//		model.addAttribute("foodId", foodId);
-//		model.addAttribute("foodName", foodName);
 		
 		return "list_food";
 	}
@@ -652,8 +651,8 @@ public class HomeController {
 		String userId = resolveUserId(req, res);
 		
 		// 削除押下なら削除実行
-		if(deleteFlg.equals("true")) {
-			if(intakeSvc.delMaker(userId, makerId) != 0) {
+		if("true".equals(deleteFlg)) {
+			if(intakeSvc.delMakerWithFavorites(userId, makerId)) {
 				ra.addFlashAttribute("msg", "メーカーを削除しました");
 				return "redirect:/list/maker";
 			}
@@ -698,8 +697,8 @@ public class HomeController {
 		String userId = resolveUserId(req, res);
 		
 		// 削除押下なら削除実行
-		if(deleteFlg.equals("true")) {
-			if(intakeSvc.delFood(userId, foodId) != 0) {
+		if("true".equals(deleteFlg)) {
+			if(intakeSvc.delFoodWithFavorites(userId, foodId)) {
 				ra.addFlashAttribute("msg", "食品情報を削除しました");
 				return "redirect:/list/food";
 			}
@@ -771,8 +770,8 @@ public class HomeController {
 		}
 		
 		// 削除押下なら削除実行
-		if(deleteFlg.equals("true")) {
-			if(intakeSvc.delNutrition(userId, nutritionId) != 0) {
+		if("true".equals(deleteFlg)) {
+			if(intakeSvc.delNutritionWithFavorites(userId, nutritionId)) {
 				ra.addFlashAttribute("msg", "栄養情報を削除しました");
 				return "redirect:/list/nutrition";
 			}

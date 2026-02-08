@@ -5,7 +5,7 @@
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
 	<title>ゆるゆる間食ログ - 栄養情報登録</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -24,12 +24,29 @@
 			<form th:action="@{/nutritions/create}" method="post" class="stack" style="gap: 0px;">
 				<div class="card">
 					<div class="stack">
+						<label th:if="${selectedFoodId == null}">メーカーから食品を絞り込めます</label>
+						<div class="row" th:if="${selectedFoodId == null}">
+							<select id="makerSelect" name="makerId">
+								<option value="" disabled selected>選択してください</option>
+								<option th:each="m : ${makers}" th:value="${m.maker_id}" th:text="${m.maker_name}"></option>
+							</select>
+							<button type="button" id="makerClearBtn" class="btn btn-ghost tap" style="white-space: nowrap;">
+								クリア
+							</button>
+						</div>
 						<label>食品</label>
-						<select name="foodId" required>
-							<option value="" disabled th:selected="${selectedFoodId == null}">選択してください</option>
-							<option th:each="f : ${foods}" th:value="${f.food_id}" th:text="${f.food_name}" th:selected="${selectedFoodId != null and f.food_id == selectedFoodId}">
+						<select id="foodSelect" name="foodId" th:if="${selectedFoodId == null}" required>
+							<option value="" disabled selected>選択してください</option>
+							<option th:each="f : ${foods}" th:value="${f.food_id}" th:text="${f.food_name}" th:attr="data-maker-id=${f.maker_id}">
 							</option>
 						</select>
+						
+						<select name="foodId" th:if="${selectedFoodId != null}" disabled>
+							<option th:each="f : ${foods}" th:value="${f.food_id}" th:text="${f.food_name}" th:selected="${f.food_id == selectedFoodId}">
+							</option>
+						</select>
+						<input type="hidden" name="foodId" th:if="${selectedFoodId != null}" th:value="${selectedFoodId}">
+						
 						<div class="row">
 							<label>分類</label>
 							<label class="muted" style="font-size: 75%; padding-left:10px;">味や内容量ごとの登録がおすすめです</label>
@@ -70,6 +87,68 @@
 		</a>
 	</nav>
 	<script>
+		(function () {
+		    const makerSelect = document.getElementById("makerSelect");
+		    const foodSelect = document.getElementById("foodSelect");
+		    if (!makerSelect || !foodSelect) return;
+
+		    // 元の食品optionを保存（先頭の「選択してください」は残す）
+		    const placeholder = foodSelect.querySelector('option[value=""]');
+		    const allFoodOptions = Array.from(foodSelect.querySelectorAll("option"))
+		      .filter(o => o.value !== "")
+		      .map(o => ({
+		        value: o.value,
+		        text: o.textContent,
+		        makerId: o.dataset.makerId
+		      }));
+
+		    function rebuild(list) {
+		      foodSelect.innerHTML = "";
+		      if (placeholder) foodSelect.appendChild(placeholder);
+
+		      for (const x of list) {
+		        const o = document.createElement("option");
+		        o.value = x.value;
+		        o.textContent = x.text;
+		        o.dataset.makerId = x.makerId; // なくても動くけど残しとく
+		        foodSelect.appendChild(o);
+		      }
+
+		      // メーカー切り替えたら食品は未選択に戻す
+		      foodSelect.value = "";
+		    }
+
+		    function apply() {
+		      const makerId = makerSelect.value;
+		      if (!makerId) {
+		        // メーカー未選択なら全食品を表示（好みで空にしてもOK）
+		        rebuild(allFoodOptions);
+		        return;
+		      }
+		      const filtered = allFoodOptions.filter(o => o.makerId === makerId);
+		      rebuild(filtered);
+		    }
+
+		    makerSelect.addEventListener("change", apply);
+
+		    // 初期は全食品表示（メーカー未選択）
+		    rebuild(allFoodOptions);
+		  })();
+		  
+		  const clearBtn = document.getElementById("makerClearBtn");
+
+		  if (clearBtn) {
+		    clearBtn.addEventListener("click", () => {
+		      // メーカーを未選択に戻す
+		      makerSelect.value = "";
+
+		      // 食品は空にする（誤登録防止）
+		      rebuild([]);
+
+		      // 見た目リセット完了
+		    });
+		  }
+		  
 	// iOS Safariで :active を確実に効かせる
 	  document.addEventListener('touchstart', () => {}, {passive:true});
 	  //	遷移時アニメーション

@@ -16,6 +16,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.HomeController.IntakeRow;
 
@@ -194,24 +195,12 @@ public class IntakeService {
 		return intakeRepo.updMaker(makerId, makerName);
 	}
 	
-	public int delMaker(String userId, long makerId) {
-		return intakeRepo.delMaker(userId, makerId);
-	}
-	
 	public int updFood(String userId, long foodId, String foodName) {
 		return intakeRepo.updFood(userId, foodId, foodName);
 	}
 	
-	public int delFood(String userId, long foodId) {
-		return intakeRepo.delFood(userId, foodId);
-	}
-	
 	public int updNutrition(String userId, long nutritionId, String className, int calorie, BigDecimal protein, BigDecimal lipid , BigDecimal carbo , BigDecimal salt) {
 		return intakeRepo.updNutrition(userId, nutritionId, className, calorie, protein, lipid, carbo, salt);
-	}
-	
-	public int delNutrition(String userId, long nutritionId) {
-		return intakeRepo.delNutrition(userId, nutritionId);
 	}
 	
 	public String getPostMsg(LocalDate today, LocalDate targetDate, int totalKcal, List<IntakeRow> targetDateAteRecords, int r) {
@@ -261,5 +250,23 @@ public class IntakeService {
 	
 	public boolean chkDepliNutritionUpd(String userId, String className, long foodId, long nutritionId) {
 		return intakeRepo.chkDepliNutritionUpd(userId, className, foodId, nutritionId);
+	}
+	
+	@Transactional
+	public boolean delMakerWithFavorites(String userId, long makerId) {
+	    intakeRepo.delFavoriteFromMaker(userId, makerId);
+	    return intakeRepo.delMaker(userId, makerId) != 0;
+	}
+	
+	@Transactional
+	public boolean delFoodWithFavorites(String userId, long foodId) {
+	    intakeRepo.delFavoriteFromFood(userId, foodId);
+	    return intakeRepo.delFood(userId, foodId) != 0;
+	}
+	
+	@Transactional
+	public boolean delNutritionWithFavorites(String userId, long nutritionId) {
+	    intakeRepo.delFavoriteFromNutrition(userId, nutritionId);
+	    return intakeRepo.delNutrition(userId, nutritionId) != 0;
 	}
 }

@@ -5,7 +5,7 @@
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
 	<title>ゆるゆる間食ログ - 食品情報登録</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,21 +15,33 @@
 		<div class="container">
 			<div class="page-title">食品登録</div>
 			<div class="page-sub">メーカーを選んで食品情報を登録します</div>
-			<div th:if="${msg}" class="toast" th:text="${msg}">
-			</div>
-			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
-			</div>
-			<div th:if="${error}" class="error" th:text="${error}">
+			<div th:if="${msg}" class="toast" th:text="${msg}"></div>
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}"></div>
+			<div th:if="${error}" class="error" th:text="${error}"></div>
+			<div class="search-box" th:if="${selectedMakerId == null}">
+				<div class="row">
+				<input id="q" class="input" style="background:#fff; margin:10px 0"
+				type="search" placeholder="メーカーを絞り込む" autocomplete="off" />
+				<button id="clearBtn" class="btn btn-ghost tap" style="white-space:nowrap;" type="button">クリア</button>
+				</div>
 			</div>
 			<div class="card" style="margin-top:10px;">
 				<form th:action="@{/foods/create-and-next}" method="post" class="stack">
 					<div class="stack">
 						<label>メーカー</label>
-						<select name="makerId" required>
-							<option value="" disabled th:selected="${selectedMakerId == null}">選択してください</option>
-							<option th:each="m : ${makers}" th:value="${m.maker_id}" th:text="${m.maker_name}" th:selected="${selectedMakerId != null and m.maker_id == selectedMakerId}">
+						
+						<select name="makerId" required th:if="${selectedMakerId == null}" id="makerSelect">
+							<option value="" disabled selected>選択してください</option>
+							<option th:each="m : ${makers}" th:value="${m.maker_id}" th:text="${m.maker_name}">
 							</option>
 						</select>
+						
+						<select disabled th:if="${selectedMakerId != null}">
+							<option th:each="m : ${makers}" th:value="${m.maker_id}" th:text="${m.maker_name}" th:selected="${m.maker_id == selectedMakerId}">
+							</option>
+						</select>
+						<input type="hidden" name="makerId" th:if="${selectedMakerId != null}" th:value="${selectedMakerId}">
+						
 					</div>
 					<div class="stack">
 						<label>食品名</label>
@@ -60,19 +72,71 @@
 		</a>
 	</nav>
 	<script>
-	// iOS Safariで :active を確実に効かせる
-	  document.addEventListener('touchstart', () => {}, {passive:true});
-	  //	遷移時アニメーション
-	  const kick = () => {
-	  const el = document.querySelector(".page");
-	  if(!el) return;
-	  el.classList.remove("is-ready"); // 再点火用
-	  requestAnimationFrame(() => el.classList.add("is-ready"));
-	  };
-	  document.addEventListener("DOMContentLoaded", kick);
-	  // iOS/Safari の戻る(キャッシュ復元)でも再点火
-	  window.addEventListener("pageshow", kick);
+		// メーカー検索（select絞り込み）
+		(function () {
+			const input = document.getElementById("q");
+			const clearBtn = document.getElementById("clearBtn");
+			const hitCount = document.getElementById("hitCount");
+			const select = document.getElementById("makerSelect");
+		
+			if (!input || !clearBtn || !select) return;
+		
+			const placeholder = select.querySelector('option[value=""]');
+			const allOptions = Array.from(select.querySelectorAll("option"))
+				.filter(o => o.value !== "")
+				.map(o => ({ value: o.value, text: o.textContent }));
+		
+			const normalize = (s) => (s ?? "").toString().trim().toLowerCase();
+		
+			function rebuild(list) {
+				select.innerHTML = "";
+				if (placeholder) select.appendChild(placeholder);
+				for (const opt of list) {
+					const o = document.createElement("option");
+					o.value = opt.value;
+					o.textContent = opt.text;
+					select.appendChild(o);
+				}
+				if (hitCount) hitCount.textContent = `${list.length}件`;
+			}
+		
+			function applyFilter() {
+				const q = normalize(input.value);
+				const filtered = q === "" ? allOptions : allOptions.filter(o => normalize(o.text).includes(q));
+				rebuild(filtered);
+		
+				// 絞り込み後、選択肢が消えたら未選択へ
+				if (q !== "" && !Array.from(select.options).some(o => o.selected && o.value !== "")) {
+					select.value = "";
+				}
+			}
+		
+			input.addEventListener("input", applyFilter);
+		
+			clearBtn.addEventListener("click", () => {
+				input.value = "";
+				rebuild(allOptions);
+				select.value = "";
+				input.focus();
+			});
+		
+		rebuild(allOptions);
+		})();
+	
+		// iOS Safariで :active を確実に効かせる
+		document.addEventListener('touchstart', () => {}, {passive:true});
+
+		// 遷移時アニメーション
+		const kick = () => {
+		const el = document.querySelector(".page");
+		if(!el) return;
+		el.classList.remove("is-ready");
+		requestAnimationFrame(() => el.classList.add("is-ready"));
+		};
+		document.addEventListener("DOMContentLoaded", kick);
+		window.addEventListener("pageshow", kick);
 	</script>
+
 </body>
 
 </html>

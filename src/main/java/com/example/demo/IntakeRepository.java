@@ -11,6 +11,7 @@ import jakarta.servlet.http.Cookie;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 //import com.example.demo.HomeController.IntakeDetailRow;
 import com.example.demo.HomeController.IntakeRow;
@@ -203,7 +204,7 @@ public class IntakeRepository {
 			        map.put("intakeId", rs.getLong("intake_id"));
 			        map.put("eatenDate", rs.getString("eaten_date"));
 			        map.put("eatenTime", rs.getString("eaten_time"));
-			        map.put("qty", rs.getInt("qty"));
+			        map.put("qty", rs.getDouble("qty"));
 			        map.put("makerName", rs.getString("maker_name"));
 			        map.put("foodName", rs.getString("food_name"));
 			        map.put("className", rs.getString("class_name"));
@@ -597,7 +598,43 @@ public class IntakeRepository {
 		return jdbc.update(sql, makerId, userId);
 	}
 	
-	
+	/*
+	 * 	「削除」押下
+	 * 	お気に入りを削除後、もとのsort_orderの順番で1からsort_orderを振り直すメソッド
+	 *	@param	userId user_id
+	 *	@param	makerId	メーカーID
+	 */
+	@Transactional
+	public void delFavoriteFromMaker(String userId, long makerId) {
+
+		// 1) メーカー配下のfavoriteを全削除
+		String del = """
+				DELETE FROM favorite
+				WHERE regist_user_id = ?
+				AND nutrition_id IN (
+					SELECT n.nutrition_id
+					FROM nutrition n
+					JOIN food f ON f.food_id = n.food_id
+					WHERE f.maker_id = ?
+				)
+			""";
+		jdbc.update(del, userId, makerId);
+
+		// 2) 残ったfavoriteの並びを詰め直し（0始まり）
+		String resequence = """
+				WITH ranked AS (
+					SELECT favorite_id,
+						ROW_NUMBER() OVER (ORDER BY sort_order, favorite_id) - 1 AS new_order
+					FROM favorite
+					WHERE regist_user_id = ?
+				)
+				UPDATE favorite f
+				SET sort_order = ranked.new_order
+				FROM ranked
+				WHERE f.favorite_id = ranked.favorite_id
+			""";
+		jdbc.update(resequence, userId);
+	}
 	
 	/*--------------------------------------
 		食品情報一覧
@@ -675,6 +712,44 @@ public class IntakeRepository {
 	public int delFood (String userId, long foodId) {
 		String sql = "DELETE FROM food WHERE food_id = ? AND regist_user_id = ?";
 		return jdbc.update(sql, foodId, userId);
+	}
+	
+	/*
+	 * 	「削除」押下
+	 * 	お気に入りを削除後、もとのsort_orderの順番で1からsort_orderを振り直すメソッド
+	 *	@param	userId user_id
+	 *	@param	foodId	食品ID
+	 */
+	@Transactional
+	public void delFavoriteFromFood(String userId, long foodId) {
+
+		// 1) food配下のfavoriteを全削除
+		String del = """
+				DELETE FROM favorite
+				WHERE regist_user_id = ?
+					AND nutrition_id IN (
+						SELECT nutrition_id
+						FROM nutrition
+						WHERE regist_user_id = ?
+							AND food_id = ?
+					)
+			""";
+		jdbc.update(del, userId, userId, foodId);
+
+		// 2) 残ったfavoriteの並びを詰め直し（0始まり）
+		String resequence = """
+					WITH ranked AS (
+						SELECT favorite_id,
+							ROW_NUMBER() OVER (ORDER BY sort_order, favorite_id) - 1 AS new_order
+						FROM favorite
+						WHERE regist_user_id = ?
+					)
+					UPDATE favorite f
+					SET sort_order = ranked.new_order
+					FROM ranked
+					WHERE f.favorite_id = ranked.favorite_id
+				""";
+		jdbc.update(resequence, userId);
 	}
 	
 	/*--------------------------------------
@@ -758,7 +833,7 @@ public class IntakeRepository {
 	public int insFavorite(String userId, long nutritionId) {
 		String sql = """
 				INSERT INTO favorite (regist_user_id, nutrition_id, sort_order)
-				VALUES (?, ?, COALESCE((SELECT MAX(sort_order) + 1 FROM favorite WHERE regist_user_id = ?),1))
+				VALUES (?, ?, COALESCE((SELECT MAX(sort_order) + 1 FROM favorite WHERE regist_user_id = ?),0))
 				ON CONFLICT (regist_user_id, nutrition_id) DO NOTHING
 		     """;
 		// 登録件数を返す（通常 1）。失敗時は例外が投げられることが多い
@@ -767,45 +842,86 @@ public class IntakeRepository {
 	
 	
 	/*
-	 * 	栄養情報のお気に入りを削除するメソッド
+	 * 	栄養情報のお気に入りを削除し、削除後もとのsort_orderの順番で1からsort_orderを振り直すメソッド
 	 *	@param	userId user_id
 	 *	@param	nutritionId	栄養ID
 	 *	@return	削除件数（通常は1）
 	 */
+	@Transactional
 	public int delFavorite(String userId, long nutritionId) {
-		// ① 削除対象の sort_order を取得
-		String sql = """
-				SELECT sort_order
-				FROM favorite
+		// 1) 単体削除
+		String del = """
+				DELETE FROM favorite
 				WHERE regist_user_id = ?
-					AND nutrition_id = ?
+				AND nutrition_id = ?
 			""";
-		Integer order = jdbc.queryForObject(sql, Integer.class, userId, nutritionId);
-		
-		if (order == null) {
-			return 0; // そもそも存在しない
-		}
-		
-		// ② 削除
-		String sql_2 = """
+		int delCnt = jdbc.update(del, userId, nutritionId);
+		if (delCnt == 0) return 0;
+
+		// 2) 並びを詰め直し（0始まり）
+		String resequence = """
+				WITH ranked AS (
+					SELECT favorite_id,
+						ROW_NUMBER() OVER (ORDER BY sort_order, favorite_id) - 1 AS new_order
+					FROM favorite
+					WHERE regist_user_id = ?
+				)
+				UPDATE favorite f
+				SET sort_order = ranked.new_order
+				FROM ranked
+				WHERE f.favorite_id = ranked.favorite_id
+			""";
+		jdbc.update(resequence, userId);
+
+		return delCnt;
+	}
+
+	
+	/*
+	 * 	「削除」押下
+	 * 	食品情報の削除を行うメソッド
+	 *	@param	userId user_id
+	 *	@param	makerId	メーカーID
+	 *	@return	削除件数（通常は1）
+	 */
+	public int delNutrition (String userId, long nutritionId) {
+		String sql = "DELETE FROM nutrition WHERE nutrition_id = ? AND regist_user_id = ?";
+		return jdbc.update(sql, nutritionId, userId);
+	}
+	
+	/*
+	 * 	「削除」押下
+	 * 	お気に入りを削除後、もとのsort_orderの順番で1からsort_orderを振り直すメソッド
+	 *	@param	userId user_id
+	 *	@param	nutritionId	栄養ID
+	 */
+	@Transactional
+	public void delFavoriteFromNutrition(String userId, long nutritionId) {
+
+		// 1) food配下のfavoriteを全削除
+		String del = """
 				DELETE FROM favorite
 				WHERE regist_user_id = ?
 					AND nutrition_id = ?
 			""";
-		// 削除件数を返す（通常 1）。失敗時は例外が投げられることが多い
-		int delCnt = jdbc.update(sql_2, userId, nutritionId);
-		
-		// ③ 後ろを詰める
-		String sql_3 = """
-				UPDATE favorite
-				SET sort_order = sort_order - 1
-				WHERE regist_user_id = ?
-					AND sort_order > ?
-			""";
-		jdbc.update(sql_3, userId, order);
-		
-		return delCnt;
+		jdbc.update(del, userId, nutritionId);
+
+		// 2) 残ったfavoriteの並びを詰め直し（0始まり）
+		String resequence = """
+					WITH ranked AS (
+						SELECT favorite_id,
+							ROW_NUMBER() OVER (ORDER BY sort_order, favorite_id) - 1 AS new_order
+						FROM favorite
+						WHERE regist_user_id = ?
+					)
+					UPDATE favorite f
+					SET sort_order = ranked.new_order
+					FROM ranked
+					WHERE f.favorite_id = ranked.favorite_id
+				""";
+		jdbc.update(resequence, userId);
 	}
+
 	
 	
 	
@@ -855,17 +971,5 @@ public class IntakeRepository {
 					AND nutrition_id = ?
 			""";
 		return jdbc.update(sql, className, calorie, protein, lipid, carbo, salt, userId, nutritionId);
-	}
-	
-	/*
-	 * 	「削除」押下
-	 * 	食品情報の削除を行うメソッド
-	 *	@param	userId user_id
-	 *	@param	makerId	メーカーID
-	 *	@return	削除件数（通常は1）
-	 */
-	public int delNutrition (String userId, long nutritionId) {
-		String sql = "DELETE FROM nutrition WHERE nutrition_id = ? AND regist_user_id = ?";
-		return jdbc.update(sql, nutritionId, userId);
 	}
 }

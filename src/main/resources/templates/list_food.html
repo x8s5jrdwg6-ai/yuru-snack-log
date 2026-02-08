@@ -5,7 +5,7 @@
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
 	<title>ゆるゆる間食ログ - 食品情報一覧</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,9 +15,13 @@
 		<div class="container">
 			<div class="page-title">食品情報一覧</div>
 			<div class="page-sub">タップで編集</div>
-			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
-			</div>
-			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;"></div>
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}"></div>
+			<div class="search-box">
+				<div class="row">
+					<input id="q" class="input" style="background: #ffffff; margin:10px 0" type="search" placeholder="食品名を検索" autocomplete="off" />
+					<button id="clearBtn" class="btn btn-ghost tap" style="white-space: nowrap;" type="button">クリア</button>
+				</div>
 			</div>
 			<div class="card" th:if="${#lists.isEmpty(foods)}">
 				<div class="muted" style="text-align: center;">食品情報が未登録です</div>
@@ -26,11 +30,17 @@
 				</div>
 			</div>
 			<div class="card" th:if="${!#lists.isEmpty(foods)}">
-				<div class="muted row" style="font-weight:800; margin-bottom:10px;">
-					<p class="left" style="margin-left: 20px;">食品</p><p class="right" style="font-size: 100%; opacity: 1;">メーカー</p>
+				<div class="muted" style="font-weight:800; margin-bottom:10px;">
+					<div class="row" style="gap:0;">
+						<div style="margin-left: auto;">
+							<p class="left" style="display: flex; justify-content: center; margin-top: 0; margin-bottom: 0;">食品名</p>
+							<p class="right" style="display: flex; justify-content: center; margin-top: 0; margin-bottom: 0;">メーカー</p>
+						</div>
+						<span id="hitCount" style="margin-left: auto;"></span>
+					</div>
 				</div>
-				<div class="grid" style="grid-template-columns: 1fr;">
-					<a class="tile tap row " th:each="f : ${foods}" th:href="@{/edit/food(makerId=${f.maker_id}, foodId=${f.food_id},foodName=${f.food_name})}">
+				<div class="card tap" th:each="f : ${foods}" th:attr="data-name=${f.food_name}">
+					<a class="list-link tap" th:href="@{/edit/food(makerId=${f.maker_id}, foodId=${f.food_id},foodName=${f.food_name})}">
 						<div class="tile-title left"  th:text="${f.food_name}">food</div>
 						<div class="tile-title right" th:text="${f.maker_name}">maker</div>
 					</a>
@@ -56,6 +66,45 @@
 		</a>
 	</nav>
 	<script>
+		// 検索
+		(function () {
+		  const input = document.getElementById("q");
+		  const clearBtn = document.getElementById("clearBtn");
+		  const hitCount = document.getElementById("hitCount");
+		  const rows = Array.from(document.querySelectorAll('.card[data-name]'));
+
+		  function normalize(s) {
+		    return (s ?? "")
+		      .toString()
+		      .trim()
+		      .toLowerCase();
+		  }
+
+		  function applyFilter() {
+		    const q = normalize(input.value);
+		    let shown = 0;
+
+		    for (const row of rows) {
+		      const name = normalize(row.dataset.name);
+		      const ok = q === "" || name.includes(q);
+		      row.style.display = ok ? "" : "none";
+		      if (ok) shown++;
+		    }
+
+		    if (hitCount) hitCount.textContent = `${shown}件`;
+		  }
+
+		  input?.addEventListener("input", applyFilter);
+
+		  clearBtn?.addEventListener("click", () => {
+		    input.value = "";
+		    applyFilter();
+		    input.focus();
+		  });
+
+		  applyFilter();
+		})();
+
 		// iOS Safariで :active を確実に効かせる
 		document.addEventListener('touchstart', () => {}, {passive:true});
 		//	遷移時アニメーション
