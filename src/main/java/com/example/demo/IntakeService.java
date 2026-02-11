@@ -269,4 +269,8 @@ public class IntakeService {
 	    intakeRepo.delFavoriteFromNutrition(userId, nutritionId);
 	    return intakeRepo.delNutrition(userId, nutritionId) != 0;
 	}
+	
+	public List<Map<String, Object>> getDailyTotalNutrition(String userId, LocalDate targetDate){
+		return intakeRepo.getDailyTotalNutrition(userId,targetDate);
+	}
 }

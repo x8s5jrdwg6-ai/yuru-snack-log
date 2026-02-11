@@ -25,54 +25,57 @@
 					<input type="hidden" name="makerId" th:value="${makerId}">
 					<input type="hidden" name="foodId" th:value="${foodId}">
 					<input type="hidden" name="nutritionId" th:value="${nutritionId}">
-					<div class="stack">
-						<div class="row">
-							<button th:if="${favoriteId == '0'}" type="submit" name="favoriteFlg" value="true" class="button05 tap" style="margin-right: auto;">
-								<i class="fa-regular fa-star fav-star"></i>
-							</button>
-							<button th:if="${favoriteId != '0'}" type="submit" name="favoriteFlg" value="false" class="button05 tap" style="margin-right: auto;">
-								<i class="fa-solid fa-star fav-star is-on"></i>
-							</button>
-							<a class="btn btn-primary tap" th:href="@{/edit/nutrition(nutritionId=${nutritionId})}">編集</a>
-							<input type="hidden" name="nutritionId" th:value="${nutritionId}">
-							<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" 
-							onclick="return confirm('この栄養情報を削除しますか？栄養情報を削除すると栄養情報に紐づく食べた！履歴も削除されます。');">削除
-							</button>
+					<div class="row">
+						<button th:if="${favoriteId == '0'}" type="submit" name="favoriteFlg" value="true" class="button05 tap" style="margin-right: auto;">
+							<i class="fa-regular fa-star fav-star"></i>
+						</button>
+						<button th:if="${favoriteId != '0'}" type="submit" name="favoriteFlg" value="false" class="button05 tap" style="margin-right: auto;">
+							<i class="fa-solid fa-star fav-star is-on"></i>
+						</button>
+						<a class="btn btn-primary tap" th:href="@{/edit/nutrition(nutritionId=${nutritionId})}">編集</a>
+						<input type="hidden" name="nutritionId" th:value="${nutritionId}">
+						<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" 
+						onclick="return confirm('この栄養情報を削除しますか？栄養情報を削除すると栄養情報に紐づく食べた！履歴も削除されます。');">削除
+						</button>
+					</div>
+					<div class="muted" style="margin-top:10px;">メーカー</div>
+					<div style="font-weight:900;" th:text="${makerName}">Calbee</div>
+					<div class="muted" style="margin-top:10px;">食品</div>
+					<div style="font-weight:900;" th:text="${foodName}">じゃがりこ</div>
+					<div class="muted" style="margin-top:10px;">分類</div>
+					<div style="font-weight:900;" th:text="${className}">サラダ</div>
+				</div>
+				<div class="card">
+					<div class="muted" style="font-weight:800;">栄養情報</div>
+					<div style="font-size:26px; font-weight:900; margin-top:6px; display: flex; justify-content: center; gap: 8px;">
+						<span th:text="${calorie}">333</span>
+						<span class="muted" style="font-weight:700; display: contents; vertical-align: bottom;">kcal</span>
+					</div>
+					<div class="grid" style="margin-top:12px;">
+						<div class="tile">
+							<div class="muted" style=" display: flex; justify-content: center;">たんぱく質</div>
+							<div style="font-weight:900;display: flex; justify-content: center;">
+								<span th:text="${protein}">0</span>g</div>
 						</div>
-						<label>メーカー</label>
-						<input class="input readonly-field" type="text" name="makerName" th:value="${makerName}" readonly>
-						<label>食品</label>
-						<input class="input readonly-field" type="text" name="foodName" th:value="${foodName}" readonly>
-						<label>分類</label>
-						<input class="input readonly-field" type="text" name="className" th:value="${className}" readonly>
-						<div class="tile" style="margin-top: 12px;">
-							<label>カロリー(kcal)</label>
-							<input class="input readonly-field" type="number" name="calorie" min="0" th:value="${calorie}" readonly>
+						<div class="tile">
+							<div class="muted" style=" display: flex; justify-content: center;">脂質</div>
+							<div style="font-weight:900;display: flex; justify-content: center;">
+								<span th:text="${lipid}">0</span>g</div>
 						</div>
-						<div class="grid">
-							<div class="tile">
-								<label>たんぱく質(g)</label>
-								<input class="input readonly-field" type="number" name="protein" th:value="${protein}" step="0.1" placeholder="任意 小数点1桁まで入力できます" readonly>
-							</div>
-							<div class="tile">
-								<label>脂質(g)</label>
-								<input class="input readonly-field" type="number" name="lipid" step="0.1" th:value="${lipid}" placeholder="任意 小数点1桁まで入力できます" readonly>
-							</div>
-							<div class="tile">
-								<label>炭水化物(g)</label>
-								<input class="input readonly-field" type="number" name="carbo" step="0.1" th:value="${carbo}" placeholder="任意 小数点1桁まで入力できます" readonly>
-							</div>
-							<div class="tile">
-								<label>塩分(g)</label>
-								<input class="input readonly-field" type="number" name="salt" step="0.01" th:value="${salt}" placeholder="任意 小数点2桁まで入力できます" readonly>
-							</div>
+						<div class="tile">
+							<div class="muted" style=" display: flex; justify-content: center;">炭水化物</div>
+							<div style="font-weight:900;display: flex; justify-content: center;">
+								<span th:text="${carbo}">0</span>g</div>
 						</div>
-
+						<div class="tile">
+							<div class="muted" style=" display: flex; justify-content: center;">塩分</div>
+							<div style="font-weight:900;display: flex; justify-content: center;">
+								<span th:text="${salt}">0</span>g</div>
+							</div>
+					</div>
+					<div id="chart" style="margin-top: 20px;" th:if="${protein != '0.0' or lipid != '0.0' or carbo != '0.0'}">
 					</div>
 				</div>
-				<br>
-<!--				<button class="btn btn-primary tap" type="submit" name="deleteFlg" value="false">更新</button>-->
-<!--				<button class="btn btn-danger tap" type="submit" name="deleteFlg" value="true" onclick="return confirm('この栄養情報を削除しますか？');">削除</button>-->
 				<hr class="hr">
 				<div class="stack">
 					<a class="btn btn-ghost tap" th:href="@{/list/nutrition}">戻る</a>
@@ -82,29 +85,48 @@
 			</form>
 		</div>
 	</div>
-		<nav class="bottom-nav">
-			<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
-				<i class="fa-solid fa-house"></i>Home</a>
-			<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
-				<i class="fa-solid fa-utensils"></i>　食べた！</a>
-			<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
-				<i class="fa-solid fa-bars"></i>メニュー</a>
-		</nav>
-		<script>
-	// iOS Safariで :active を確実に効かせる
-			document.addEventListener('touchstart', () => {}, {passive:true});
-			//	遷移時アニメーション
-			const kick = () => {
-			const el = document.querySelector(".page");
-			if(!el) return;
-			el.classList.remove("is-ready"); // 再点火用
-			requestAnimationFrame(() => el.classList.add("is-ready"));
-			};
-			document.addEventListener("DOMContentLoaded", kick);
-			// iOS/Safari の戻る(キャッシュ復元)でも再点火
-			window.addEventListener("pageshow", kick);
-		</script>
+	<nav class="bottom-nav">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+			<i class="fa-solid fa-house"></i>Home</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+			<i class="fa-solid fa-utensils"></i>　食べた！</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+			<i class="fa-solid fa-bars"></i>メニュー</a>
+	</nav>
 
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script th:inline="javascript">
+		const protein = /*[[${protein}]]*/ 0;
+		const lipid   = /*[[${lipid}]]*/ 0;
+		const carbo   = /*[[${carbo}]]*/ 0;
+
+		const toNum = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
+
+		const options = {
+		  chart: { type: 'donut' },
+		  labels: ['たんぱく質', '脂質', '炭水化物'],
+		  series: [toNum(protein), toNum(lipid), toNum(carbo)],
+		  legend: { position: 'bottom' },
+		  dataLabels: { formatter: (val) => `${val.toFixed(1)}%` },
+		  tooltip: { y: { formatter: (value) => `${Number(value).toFixed(1)} g` } },
+		  plotOptions: { pie: { donut: { size: '68%' } } }
+		};
+
+		new ApexCharts(document.querySelector("#chart"), options).render();
+	</script>
+	<script>
+		// iOS Safariで :active を確実に効かせる
+		document.addEventListener('touchstart', () => {}, {passive:true});
+		//	遷移時アニメーション
+		const kick = () => {
+		const el = document.querySelector(".page");
+		if(!el) return;
+		el.classList.remove("is-ready"); // 再点火用
+		requestAnimationFrame(() => el.classList.add("is-ready"));
+		};
+		document.addEventListener("DOMContentLoaded", kick);
+		// iOS/Safari の戻る(キャッシュ復元)でも再点火
+		window.addEventListener("pageshow", kick);
+	</script>
 </body>
-
 </html>

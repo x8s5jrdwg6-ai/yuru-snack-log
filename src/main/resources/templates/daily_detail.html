@@ -4,7 +4,7 @@
 <head>
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta charset="UTF-8">
-	<title>ゆるゆる間食ログ - 食べた！履歴詳細</title>
+	<title>ゆるゆる間食ログ - 1日の合計</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,58 +13,44 @@
 <body>
 	<div class="page">
 		<div class="container">
-			<div class="page-title">食べた！履歴詳細</div>
+			<div class="page-title">1日の合計</div>
 			<div class="card">
 				<div class="stack_3">
 					<div>
-						<div class="muted">食べた日時</div>
-						<div style="font-weight:900;" th:text="${#strings.substring(eatenDatetime, 0, 16)}">2026-01-28 12:34</div>
-					</div>
-					<div class="row" style="margin: 0 0 0 auto;">
-						<a class="btn btn-primary tap" th:href="@{/intake/edit(intakeId=${intakeId}, date=${targetDate})}">編集</a>
-						<form th:action="@{/intake/delete}" method="post" style="margin:0;">
-							<input type="hidden" name="intakeId" th:value="${intakeId}">
-							<input type="hidden" name="hiddenDate" th:value="${targetDate}">
-							<button class="btn btn-danger tap" type="submit" onclick="return confirm('この履歴を削除しますか？');">削除</button>
-						</form>
+						<div class="muted">日付</div>
+						<div style="font-weight:900;" th:text="${targetDate}">2026-01-28 12:34</div>
 					</div>
 				</div>
-				<div class="muted" style="margin-top:10px;">メーカー</div>
-				<div style="font-weight:900;" th:text="${makerName}">Calbee</div>
-				<div class="muted" style="margin-top:10px;">食品</div>
-				<div style="font-weight:900;" th:text="${foodName}">じゃがりこ</div>
-				<div class="muted" style="margin-top:10px;">分類</div>
-				<div style="font-weight:900;" th:text="${className}">サラダ</div>
 			</div>
 			<div class="card">
 				<div class="muted" style="font-weight:800;">栄養情報</div>
-				<div style="font-size:26px; font-weight:900; margin-top:6px; display: flex; justify-content: center; gap: 8px;">
-					<span th:text="${calorie}">333</span>
+				<div style="font-size:26px; font-weight:900; display: flex; justify-content: center; gap: 8px;">
+					<span th:text="${totalKcal}">333</span>
 					<span class="muted" style="font-weight:700; display: contents; vertical-align: bottom;">kcal</span>
 				</div>
 				<div class="grid" style="margin-top:12px;">
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">たんぱく質</div>
-						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${protein}">0</span>g</div>
+						<div style="font-weight:900; display: flex; justify-content: center;">
+							<span th:text="${dailyTotalNutritionList[0].protein}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">脂質</div>
-						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${lipid}">0</span>g</div>
+						<div style="font-weight:900; display: flex; justify-content: center;">
+							<span th:text="${dailyTotalNutritionList[0].lipid}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">炭水化物</div>
-						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${carbo}">0</span>g</div>
+						<div style="font-weight:900; display: flex; justify-content: center;">
+							<span th:text="${dailyTotalNutritionList[0].carbo}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">塩分</div>
-						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${salt}">0</span>g</div>
+						<div style="font-weight:900; display: flex; justify-content: center;">
+							<span th:text="${dailyTotalNutritionList[0].salt}">0</span>g</div>
 					</div>
 				</div>
-				<div id="chart" style="margin-top: 20px;" th:if="${protein != 0.0 or lipid != 0.0 or carbo != 0.0}">
+				<div id="chart" style="margin-top: 20px;" th:if="${dailyTotalNutritionList[0].protein != 0.0 and dailyTotalNutritionList[0].lipid != 0.0 and dailyTotalNutritionList[0].carbo != 0.0}">
 				</div>
 			</div>
 			<hr class="hr">
@@ -88,9 +74,9 @@
 	</nav>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script th:inline="javascript">
-		const protein = /*[[${protein}]]*/ 0;
-		const lipid   = /*[[${lipid}]]*/ 0;
-		const carbo   = /*[[${carbo}]]*/ 0;
+		const protein = /*[[${dailyTotalNutritionList[0].protein}]]*/ 0;
+		const lipid   = /*[[${dailyTotalNutritionList[0].lipid}]]*/ 0;
+		const carbo   = /*[[${dailyTotalNutritionList[0].carbo}]]*/ 0;
 
 		const toNum = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 

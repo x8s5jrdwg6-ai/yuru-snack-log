@@ -89,6 +89,36 @@ public class HomeController {
 		this.intakeSvc = intakeSvc;
 	}
 	
+	
+	
+	
+	// 合計押下時
+	@GetMapping("/daily/detail")
+	public String dailyDetail(@RequestParam(name = "date", required = false) String date,
+				Model model,
+				HttpServletRequest req,
+				HttpServletResponse res) throws Exception {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		// 三項演算子（条件 ? 真のときの値 : 偽のときの値）
+		LocalDate targetDate = (date == null || date.isBlank()) ? LocalDate.now(): LocalDate.parse(date);
+		
+		
+		// 合計カロリー取得
+		int totalKcal = intakeSvc.calcTotalCal(userId, targetDate);
+		
+		List<Map<String, Object>> dailyTotalNutritionList = intakeSvc.getDailyTotalNutrition(userId, targetDate);
+		
+		// modelに格納
+		model.addAttribute("targetDate", targetDate.toString());
+		model.addAttribute("totalKcal", totalKcal);
+		model.addAttribute("dailyTotalNutritionList", dailyTotalNutritionList);
+		
+	    return "daily_detail";
+	}
+	
+	
+	
 	/*--------------------------------------
 		画面遷移
 	--------------------------------------*/
@@ -447,6 +477,8 @@ public class HomeController {
 		model.addAttribute("salt", nutritionInfo.get("salt").toString());
 		model.addAttribute("favoriteId", nutritionInfo.get("favoriteId").toString());	// 0なら未登録
 		
+		
+		
 		return "nutrition_detail";
 	}
 	
@@ -799,7 +831,7 @@ public class HomeController {
 			ra.addFlashAttribute("errorMsg", "更新に失敗しました");
 		}
 		
-		return "redirect:/list/nutrition";
+		return "redirect:/nutrition/detail?nutritionId=" + nutritionId;
 	}
 	
 	

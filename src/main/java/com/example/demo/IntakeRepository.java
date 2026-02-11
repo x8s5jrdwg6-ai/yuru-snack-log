@@ -219,6 +219,28 @@ public class IntakeRepository {
 		return intake;
 	}
 	
+	/*--------------------------------------
+ 		デイリー詳細画面
+	--------------------------------------*/
+	public List<Map<String, Object>> getDailyTotalNutrition(String userId, LocalDate targetDate){
+		String sql = """
+				SELECT COALESCE(SUM(protein), 0) AS protein, COALESCE(SUM(lipid), 0) AS lipid, COALESCE(SUM(carbo), 0) AS carbo, COALESCE(SUM(salt), 0) AS salt
+				FROM intake i
+				INNER JOIN nutrition n
+					ON i.nutrition_id = n.nutrition_id
+				INNER JOIN food f
+					ON n.food_id = f.food_id
+				INNER JOIN maker m
+					ON f.maker_id = m.maker_id
+				WHERE i.regist_user_id = ?
+					AND eaten_date = ?
+			""";
+		
+		return jdbc.queryForList(sql, userId, targetDate);
+	}
+	
+	
+	
 /*--------------------------------------
  	詳細画面
 --------------------------------------*/
