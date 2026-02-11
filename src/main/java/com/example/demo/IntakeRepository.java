@@ -224,7 +224,16 @@ public class IntakeRepository {
 	--------------------------------------*/
 	public List<Map<String, Object>> getDailyTotalNutrition(String userId, LocalDate targetDate){
 		String sql = """
-				SELECT COALESCE(SUM(protein), 0) AS protein, COALESCE(SUM(lipid), 0) AS lipid, COALESCE(SUM(carbo), 0) AS carbo, COALESCE(SUM(salt), 0) AS salt
+				SELECT	COALESCE(SUM(n.protein), 0) AS protein_g,
+						COALESCE(SUM(n.lipid),   0) AS lipid_g,
+						COALESCE(SUM(n.carbo),   0) AS carbo_g,
+						COALESCE(SUM(n.salt),    0) AS salt_g,
+
+						COALESCE(SUM(n.protein * 4), 0) AS protein_kcal,
+						COALESCE(SUM(n.lipid   * 9), 0) AS lipid_kcal,
+						COALESCE(SUM(n.carbo   * 4), 0) AS carbo_kcal,
+
+						COALESCE(SUM(n.protein * 4 + n.lipid * 9 + n.carbo * 4), 0) AS pfc_kcal_total
 				FROM intake i
 				INNER JOIN nutrition n
 					ON i.nutrition_id = n.nutrition_id
