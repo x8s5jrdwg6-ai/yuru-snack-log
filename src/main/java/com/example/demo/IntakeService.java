@@ -51,17 +51,29 @@ public class IntakeService {
 		return intakeRepo.calcTotalCal(userId, eatenDate);
 	}
 
-	public int insIntake(String userId, long nutritionId) {
+	public int insIntake(String userId, long nutritionId, BigDecimal qty) {
 		LocalDateTime now = LocalDateTime.now();
-		return intakeRepo.insIntake(userId, nutritionId, now.toLocalDate(), now.toLocalTime());
+		return intakeRepo.insIntake(userId, nutritionId, now.toLocalDate(), now.toLocalTime(), qty);
 	}
 	
 	public void updIntake(String userId, long intakeId, LocalDate eatenDate, LocalTime eatenTime) {
 		intakeRepo.updIntake(userId, intakeId, eatenDate, eatenTime);
 	}
 	
+	public void updIntakeOnce(String userId, long intakeOnceId, LocalDate eatenDate, LocalTime eatenTime) {
+		intakeRepo.updIntakeOnce(userId, intakeOnceId, eatenDate, eatenTime);
+	}
+	
 	public int delIntake(String userId, long intakeId) {
 		return intakeRepo.delIntake(intakeId, userId);
+	}
+	
+	public int delIntakeOnce(String userId, long intakeOnceId) {
+		return intakeRepo.delIntakeOnce(intakeOnceId, userId);
+	}
+	
+	public int insIntakeOnce(String userId, String foodName, int calorie, Double protein, Double lipid, Double carbo, Double salt) {
+		return intakeRepo.insIntakeOnce(userId, foodName, calorie, protein, lipid, carbo, salt);
 	}
 	
 	public int insFoodMaker(String userId, String makerName) {
@@ -114,6 +126,10 @@ public class IntakeService {
 	
 	public Map<String, Object> getIntakeDetail(String userId, long intakeId) {
 		return intakeRepo.getIntakeDetail(userId, intakeId);
+	}
+	
+	public Map<String, Object> getIntakeOnceDetail(String userId, long intakeId) {
+		return intakeRepo.getIntakeOnceDetail(userId, intakeId);
 	}
 	
 	public List<Map<String, Object>> getMakerList(String userId){

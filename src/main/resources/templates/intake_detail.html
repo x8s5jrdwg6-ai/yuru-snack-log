@@ -21,9 +21,11 @@
 						<div style="font-weight:900;" th:text="${#strings.substring(eatenDatetime, 0, 16)}">2026-01-28 12:34</div>
 					</div>
 					<div class="row" style="margin: 0 0 0 auto;">
-						<a class="btn btn-primary tap" th:href="@{/intake/edit(intakeId=${intakeId}, date=${targetDate})}">編集</a>
+						<a class="btn btn-primary tap" th:if="${intakeOnceId == null}" th:href="@{/intake/edit(intakeId=${intakeId}, date=${targetDate})}">編集</a>
+						<a class="btn btn-primary tap" th:if="${intakeOnceId != null}" th:href="@{/intake_once/edit(intakeOnceId=${intakeOnceId}, date=${targetDate})}">編集</a>
 						<form th:action="@{/intake/delete}" method="post" style="margin:0;">
 							<input type="hidden" name="intakeId" th:value="${intakeId}">
+							<input type="hidden" name="intakeOnceId" th:value="${intakeOnceId}">
 							<input type="hidden" name="hiddenDate" th:value="${targetDate}">
 							<button class="btn btn-danger tap" type="submit" onclick="return confirm('この履歴を削除しますか？');">削除</button>
 						</form>
@@ -46,22 +48,22 @@
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">たんぱく質</div>
 						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${protein}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(protein, 1, 'NONE', 1, 'POINT')}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">脂質</div>
 						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${lipid}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(lipid, 1, 'NONE', 1, 'POINT')}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">炭水化物</div>
 						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${carbo}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(carbo, 1, 'NONE', 1, 'POINT')}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">塩分</div>
 						<div style="font-weight:900;display: flex; justify-content: center;">
-							<span th:text="${salt}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(salt, 1, 'NONE', 2, 'POINT')}">0</span>g</div>
 					</div>
 				</div>
 <!--				<div id="chart" style="margin-top: 20px;" th:if="${protein != 0.0 or lipid != 0.0 or carbo != 0.0}">-->
@@ -79,7 +81,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">

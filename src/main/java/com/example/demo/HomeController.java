@@ -38,7 +38,7 @@ public class HomeController {
 	/*--------------------------------------
 		record
 	--------------------------------------*/
-	public record IntakeRow(long intakeId, String eatenDate, String eatenTime, double qty, String foodName, String className, int calorie) {
+	public record IntakeRow(long intakeId, long intakeOnceId, String eatenDate, String eatenTime, double qty, String foodName, String className, int calorie) {
 		public int kcalTotal() {
 			return (int) Math.round(calorie * qty);
 		}
@@ -216,6 +216,38 @@ public class HomeController {
 		return "intake_detail";
 	}
 	
+	@GetMapping("/intake_once/detail")
+	public String intakeOnceDetail(@RequestParam("intakeOnceId") long intakeOnceId,
+			@RequestParam("date") String date,
+			Model model,
+            HttpServletRequest req,
+            HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// IDから詳細情報を取得
+		Map<String, Object> map = intakeSvc.getIntakeOnceDetail(userId, intakeOnceId);
+		if(map == null) {
+			model.addAttribute("errorMsg", "該当の履歴が見つかりません");
+			return "home";
+		}
+		
+		model.addAttribute("targetDate", date);
+		model.addAttribute("targetId", map.get("intakeId"));
+		model.addAttribute("intakeOnceId", map.get("intakeOnceId"));
+		model.addAttribute("eatenDatetime", (map.get("eatenDate") + " " + map.get("eatenTime")));
+		model.addAttribute("makerName", map.get("makerName"));
+		model.addAttribute("foodName", map.get("foodName"));
+		model.addAttribute("className", map.get("className"));
+		model.addAttribute("calorie", map.get("calorie"));
+		model.addAttribute("protein", map.get("protein"));
+		model.addAttribute("lipid", map.get("lipid"));
+		model.addAttribute("carbo", map.get("carbo"));
+		model.addAttribute("salt", map.get("salt"));
+		
+		return "intake_detail";
+	}
+	
 	// 詳細画面：編集押下時
 	@GetMapping("/intake/edit")
 	public String intakeEdit(@RequestParam("intakeId") long intakeId,
@@ -244,6 +276,34 @@ public class HomeController {
 		return "intake_edit";
 	}
 	
+	// 詳細画面：編集押下時
+	@GetMapping("/intake_once/edit")
+	public String intakeOnceEdit(@RequestParam("intakeOnceId") long intakeOnceId,
+			@RequestParam("date") String date,
+			Model model,
+            HttpServletRequest req,
+            HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// IDから詳細情報を取得
+		Map<String, Object> map = intakeSvc.getIntakeOnceDetail(userId, intakeOnceId);
+		if(map == null) {
+			model.addAttribute("errorMsg", "該当の履歴が見つかりません");
+			return "home";
+		}
+				
+		model.addAttribute("targetDate", date);
+		model.addAttribute("intakeOnceId", map.get("intakeOnceId"));
+		model.addAttribute("eatenDate", (map.get("eatenDate")));
+		model.addAttribute("eatenTime", (map.get("eatenTime")));
+		model.addAttribute("foodName", map.get("foodName"));
+		model.addAttribute("className", map.get("className"));
+		model.addAttribute("calorie", map.get("calorie"));
+
+		return "intake_edit";
+	}
+	
 	// ナビゲーション：食べた押下時
 	// 食べた登録画面：食品選択画面：「←メーカー選択へ戻る」押下時
 	@GetMapping("/eat")
@@ -262,7 +322,8 @@ public class HomeController {
 	
 	// 食べた登録画面：メーカ選択画面：メーカー選択時
 	@GetMapping("/eat/foods")
-	public String eatFoods(@RequestParam("makerId") long makerId, Model model,
+	public String eatFoods(@RequestParam("makerId") long makerId,
+			Model model,
             HttpServletRequest req,
             HttpServletResponse res) {
 		// user_id取得処理（仮）
@@ -416,6 +477,24 @@ public class HomeController {
 		return "list_food";
 	}
 	
+	// 食べた！メニュー：食品から登録する押下
+	@GetMapping("/list/food/to/eat")
+	public String listFoodToeat(
+			Model model,
+			HttpServletRequest req,
+			HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		
+		// ユーザーIDと選択したメーカーに紐づく食品一覧を取得
+		List<Map<String, Object>> foods = intakeSvc.getFoodListAll(userId);
+		
+		model.addAttribute("foods", foods);
+		model.addAttribute("eatFlg", "true");
+		
+		return "list_food";
+	}
+	
 	// 食品情報一覧：選択時
 	@GetMapping("/edit/food")
 	public String editFood(@RequestParam(name="makerId", required=false) Long makerId,
@@ -477,8 +556,6 @@ public class HomeController {
 		model.addAttribute("salt", nutritionInfo.get("salt").toString());
 		model.addAttribute("favoriteId", nutritionInfo.get("favoriteId").toString());	// 0なら未登録
 		
-		
-		
 		return "nutrition_detail";
 	}
 	
@@ -509,6 +586,18 @@ public class HomeController {
 		return "edit_nutrition";
 	}
 	
+	
+	
+	
+	
+	// ナビゲーションバー：食べた！押下時
+	@GetMapping("/eat/menu")
+	public String eatMenu(HttpServletRequest req, HttpServletResponse res) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		return "eat_menu";
+	}
+	
 	/*--------------------------------------
 		Home画面
 	--------------------------------------*/
@@ -532,7 +621,8 @@ public class HomeController {
 	--------------------------------------*/
 	// 削除押下時
 	@PostMapping("/intake/delete")
-	public String delete(@RequestParam("intakeId") long intakeId,
+	public String delete(@RequestParam(value="intakeId", required=false) Long intakeId,
+			@RequestParam(value="intakeOnceId", required=false) Long intakeOnceId,
 			@RequestParam("hiddenDate") String hiddenDate,
 			RedirectAttributes ra,
             HttpServletRequest req,
@@ -541,18 +631,27 @@ public class HomeController {
 		String userId = resolveUserId(req, res);
 		
 		// 削除実行
-		if(intakeSvc.delIntake(userId, intakeId) != 0) {
-			ra.addFlashAttribute("msg", "食べた！履歴を削除しました");
-			return "redirect:/?date=" + hiddenDate;
+		if(intakeId != null) {
+			if(intakeSvc.delIntake(userId, intakeId) != 0) {
+				ra.addFlashAttribute("msg", "食べた！履歴を削除しました");
+				return "redirect:/?date=" + hiddenDate;
+			}
+		}else {
+			if(intakeSvc.delIntakeOnce(userId, intakeOnceId) != 0) {
+				ra.addFlashAttribute("msg", "食べた！履歴を削除しました");
+				return "redirect:/?date=" + hiddenDate;
+			}
 		}
 		
 		ra.addFlashAttribute("errorMsg", "削除に失敗しました");
 		return "redirect:/?date=" + hiddenDate;
 	}
 	
+	// 更新押下時
 	@PostMapping("/intake/update")
 	public String intakeUpdate(
-			@RequestParam("intakeId") long intakeId,
+			@RequestParam(value="intakeId", required=false) Long intakeId,
+			@RequestParam(value="intakeOnceId", required=false) Long intakeOnceId,
 			@RequestParam("eatenDate") LocalDate eatenDate,
 			@RequestParam("eatenTime") LocalTime eatenTime,
 			@RequestParam("hiddenDate") String hiddenDate,
@@ -562,9 +661,13 @@ public class HomeController {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
 		
-		intakeSvc.updIntake(userId, intakeId, eatenDate, eatenTime);
-
-		return "redirect:/intake/detail?intakeId=" + intakeId + "&date=" + hiddenDate;
+		if(intakeId != null) {
+			intakeSvc.updIntake(userId, intakeId, eatenDate, eatenTime);
+			return "redirect:/intake/detail?intakeId=" + intakeId + "&date=" + hiddenDate;
+		}else {
+			intakeSvc.updIntakeOnce(userId, intakeOnceId, eatenDate, eatenTime);
+			return "redirect:/intake_once/detail?intakeOnceId=" + intakeOnceId + "&date=" + hiddenDate;
+		}
 	}
 
 
@@ -631,7 +734,6 @@ public class HomeController {
 			@RequestParam(name="lipid", required=false) Double lipid,
 			@RequestParam(name="carbo", required=false) Double carbo,
 			@RequestParam(name="salt", required=false) Double salt,
-//			@RequestParam(name="plainFlg", required=false) String plainFlg,
 			RedirectAttributes ra,
             HttpServletRequest req,
             HttpServletResponse res
@@ -658,13 +760,16 @@ public class HomeController {
 	// 食べた！押下時
 	@PostMapping("/eat/record")
 	public String eatRecord(@RequestParam("nutritionId") long nutritionId,
+			@RequestParam(required=false) BigDecimal qty,
 			RedirectAttributes ra,
             HttpServletRequest req,
             HttpServletResponse res) {
 		// user_id取得処理（仮）
 		String userId = resolveUserId(req, res);
-		
-		intakeSvc.insIntake(userId, nutritionId);
+		if(qty == null) {
+			qty = BigDecimal.valueOf(1);
+		}
+		intakeSvc.insIntake(userId, nutritionId, qty);
 		ra.addFlashAttribute("msg", "食べた！を記録しました。");
 		return "redirect:/";
 	}
@@ -765,9 +870,9 @@ public class HomeController {
 	--------------------------------------*/
 	@PostMapping("/edit/nutrition")
 	public String editNutrition(@RequestParam("nutritionId") long nutritionId,
-			@RequestParam("foodId") long foodId,
-			@RequestParam("className") String className,
-			@RequestParam("calorie") int calorie,
+			@RequestParam(value="foodId", required=false) long foodId,
+			@RequestParam(value="className", required=false) String className,
+			@RequestParam(value="calorie", required=false) Integer calorie,
 			@RequestParam(value="protein", required=false) BigDecimal protein,
 			@RequestParam(value="lipid",   required=false) BigDecimal lipid ,
 			@RequestParam(value="carbo",   required=false) BigDecimal carbo ,
@@ -835,7 +940,34 @@ public class HomeController {
 	}
 	
 	
-	
+	/*--------------------------------------
+		栄養情報登録画面
+	--------------------------------------*/
+	@PostMapping("/intake/once/regist")
+	public String intakeOnceRegist(
+			@RequestParam("foodName") String foodName,
+			@RequestParam("calorie") int calorie,
+			@RequestParam(name="protein", required=false) Double protein,
+			@RequestParam(name="lipid", required=false) Double lipid,
+			@RequestParam(name="carbo", required=false) Double carbo,
+			@RequestParam(name="salt", required=false) Double salt,
+			RedirectAttributes ra,
+	        HttpServletRequest req,
+	        HttpServletResponse res
+			) {
+		// user_id取得処理（仮）
+		String userId = resolveUserId(req, res);
+		if(foodName.isEmpty()) {
+			foodName = null;
+		}
+		if(intakeSvc.insIntakeOnce(userId, foodName, calorie, protein, lipid, carbo, salt) != 1) {
+			ra.addFlashAttribute("errorMsg", "エラー");
+		}else {
+			ra.addFlashAttribute("msg", "食べた！を登録しました");
+		}
+		
+		return "redirect:/";
+	}
 	
 	
 	

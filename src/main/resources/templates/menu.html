@@ -14,26 +14,32 @@
 	<div class="page" style="text-align: center;">
 		<h2 class="page-title">メニュー</h2>
 		<div class="container" style="padding-top: 0; padding-bottom: 0;">
-			<h4 style="margin-bottom: 0;">登録</h4>
-<!--			<p style="opacity: 0.7; font-size: 75%;">登録はここから</p>-->
+			<h4 style="margin-bottom: 0;">各種情報登録</h4>
 			<div class="card" style="margin-top:12px;">
-					<a th:href="@{/makers/new}" class="registlink tap">
-						メーカー登録
-					</a>
-					<a th:href="@{/foods/new}" class="registlink tap">
-						食品情報登録
-					</a>
-					<a th:href="@{/nutritions/new}" class="registlink tap">
-						栄養情報登録
-					</a>
-					<a th:href="@{/eat}" class="registlink tap">
-						食べた！登録
-					</a>
+				<a th:href="@{/makers/new}" class="registlink tap">
+					メーカー登録
+				</a>
+				<a th:href="@{/foods/new}" class="registlink tap">
+					食品情報登録
+				</a>
+				<a th:href="@{/nutritions/new}" class="registlink tap">
+					栄養情報登録
+				</a>
 			</div>
 		</div>
+<!--		<div class="container" style="padding-top: 0; padding-bottom: 0;">-->
+<!--			<h4 style="margin-bottom: 0;">食べた！登録</h4>-->
+<!--			<div class="card" style="margin-top:12px;">-->
+<!--				<a th:href="@{/eat}" class="registlink tap">-->
+<!--					メーカーを選んで登録する-->
+<!--				</a>-->
+<!--				<a th:href="@{/list/food/to/eat}" class="registlink tap">-->
+<!--					食品を選んで登録する-->
+<!--				</a>-->
+<!--			</div>-->
+<!--		</div>-->
 		<div class="container" style="padding-top: 0;">
 			<h4 style="margin-bottom: 0;">登録情報一覧</h4>
-<!--			<p style="opacity: 0.7; font-size: 75%;">編集もここから</p>-->
 			<div class="card" style="margin-top:12px;">
 				<a th:href="@{/list/maker}" class="registlink tap">
 					メーカー一覧
@@ -58,7 +64,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" th:href="@{/menu}">

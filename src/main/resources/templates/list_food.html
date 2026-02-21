@@ -14,7 +14,8 @@
 	<div class="page">
 		<div class="container">
 			<div class="page-title">食品情報一覧</div>
-			<div class="page-sub">タップで編集</div>
+			<div class="page-sub" th:if="${eatFlg == null}">タップで編集</div>
+			<div class="page-sub" th:if="${eatFlg != null}">タップで選択</div>
 			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;"></div>
 			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}"></div>
 			<div class="search-box">
@@ -39,11 +40,21 @@
 						<span id="hitCount" style="margin-left: auto;"></span>
 					</div>
 				</div>
-				<div class="card tap" th:each="f : ${foods}" th:attr="data-name=${f.food_name}">
-					<a class="list-link tap" th:href="@{/edit/food(makerId=${f.maker_id}, foodId=${f.food_id},foodName=${f.food_name})}">
-						<div class="tile-title left"  th:text="${f.food_name}">food</div>
-						<div class="tile-title right" th:text="${f.maker_name}">maker</div>
-					</a>
+				<div th:if="${eatFlg == null}">
+					<div class="card tap" th:each="f : ${foods}" th:attr="data-name=${f.food_name}">
+						<a class="list-link tap" th:href="@{/edit/food(makerId=${f.maker_id}, foodId=${f.food_id},foodName=${f.food_name})}">
+							<div class="tile-title left"  th:text="${f.food_name}">food</div>
+							<div class="tile-title right" th:text="${f.maker_name}">maker</div>
+						</a>
+					</div>
+				</div>
+				<div th:if="${eatFlg != null}">
+					<div class="card tap" th:each="f : ${foods}" th:attr="data-name=${f.food_name}">
+						<a class="list-link tap" th:href="@{/eat/nutritions(foodId=${f.food_id})}">
+							<div class="tile-title left"  th:text="${f.food_name}">food</div>
+							<div class="tile-title right" th:text="${f.maker_name}">maker</div>
+						</a>
+					</div>
 				</div>
 			</div>
 			<hr class="hr">
@@ -58,7 +69,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">

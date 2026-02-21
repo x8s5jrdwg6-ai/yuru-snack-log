@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta charset="UTF-8">
+	<title>ゆるゆる間食ログ - 食べた！メニュー</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+	<link rel="stylesheet" th:href="@{/css/base.css(v=${appVersion})}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+	<div class="page" style="text-align: center;">
+		<h2 class="page-title">食べた！メニュー</h2>
+		<div class="container" style="padding-top: 0; padding-bottom: 0;">
+			<h4 style="margin-bottom: 0;">登録メニュー</h4>
+			<div class="card" style="margin-top:12px;">
+					<a th:href="@{/eat}" class="registlink tap">
+						メーカーから選んで登録する
+					</a>
+					<a th:href="@{/list/food/to/eat}" class="registlink tap">
+						食品名から選んで登録する
+					</a>
+<!--					<a th:href="@{/list/history}" class="registlink tap">-->
+<!--						最近の登録履歴から登録する-->
+<!--					</a>-->
+			</div>
+			<div class="card" style="margin-top:12px;">
+				<h4 style="margin-top:auto;">簡易登録</h4>
+				<form class="stack" th:action="@{/intake/once/regist}" method="post">
+					<label style="display: flex;">食品</label>
+					<input class="input" type="text" name="foodName" placeholder="空欄可">
+					<label style="display: flex;">カロリー(kcal)</label>
+					<input class="input" type="number" name="calorie" min="0" th:value="${calorie}" required>
+					<details>
+						<summary class="muted fav-acc__head"style="font-weight:800;">
+							<span>詳細情報登録</span>
+						</summary>
+						<div class="stack">
+							<label style="display: flex;">たんぱく質(g)</label>
+							<input class="input" type="number" name="protein" th:value="${protein}" max="999999999.9" step="0.1" placeholder="空欄可 小数点1桁まで入力できます">
+							<label style="display: flex;">脂質(g)</label>
+							<input class="input" type="number" name="lipid" step="0.1" th:value="${lipid}" max="999999999.9" placeholder="空欄可 小数点1桁まで入力できます">
+							<label style="display: flex;">炭水化物(g)</label>
+							<input class="input" type="number" name="carbo" step="0.1" th:value="${carbo}" max="999999999.9" placeholder="空欄可 小数点1桁まで入力できます">
+							<label style="display: flex;">塩分(g)</label>
+							<input class="input" type="number" name="salt" step="0.01" th:value="${salt}" max="999999999.99" placeholder="空欄可 小数点2桁まで入力できます">
+						</div>
+					</details>
+					<button class="btn btn-primary tap" type="submit" style="margin-top: 15px;">登録</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div style="height:150px;">
+	</div>
+	<nav class="bottom-nav">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+			<i class="fa-solid fa-house"></i> Home
+		</a>
+		<a class="nav-item menu-btn" th:href="@{/eat/menu}">
+			<i class="fa-solid fa-utensils"></i> 　食べた！
+		</a>
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
+			<i class="fa-solid fa-bars"></i> メニュー
+		</a>
+	</nav>
+	<script>
+		// iOS Safariで :active を確実に効かせる
+		document.addEventListener('touchstart', () => {}, {passive:true});
+		//	遷移時アニメーション
+		const kick = () => {
+		const el = document.querySelector(".page");
+		if(!el) return;
+		el.classList.remove("is-ready"); // 再点火用
+		requestAnimationFrame(() => el.classList.add("is-ready"));
+		};
+		document.addEventListener("DOMContentLoaded", kick);
+		// iOS/Safari の戻る(キャッシュ復元)でも再点火
+		window.addEventListener("pageshow", kick);
+	</script>
+</body>
+
+</html>

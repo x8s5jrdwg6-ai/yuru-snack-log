@@ -27,6 +27,7 @@
 			<div class="card">
 				<form th:action="@{/intake/update}" method="post" class="stack">
 					<input type="hidden" name="intakeId" th:value="${intakeId}">
+					<input type="hidden" name="intakeOnceId" th:value="${intakeOnceId}">
 					<div class="stack">
 						<label>	食べた日付</label>
 						<input class="input" type="date" name="eatenDate" th:value="${eatenDate}" required>
@@ -38,7 +39,8 @@
 					</div>
 					<br>
 					<button class="btn btn-primary tap" type="submit">更新</button>
-					<a class="btn btn-ghost tap" th:href="@{/intake/detail(intakeId=${intakeId}, date=${targetDate})}">戻る</a>
+					<a class="btn btn-ghost tap" th:if="${intakeOnceId == null}" th:href="@{/intake/detail(intakeId=${intakeId}, date=${targetDate})}">戻る</a>
+					<a class="btn btn-ghost tap" th:if="${intakeOnceId != null}" th:href="@{/intake_once/detail(intakeOnceId=${intakeOnceId}, date=${targetDate})}">戻る</a>
 				</form>
 			</div>
 			<div style="height:72px;">
@@ -49,7 +51,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">

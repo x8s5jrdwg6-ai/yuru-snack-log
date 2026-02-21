@@ -16,10 +16,11 @@
 		<h4>リリースノート</h4>
 		<div class="container" style="padding-top: 0; padding-bottom: 20px;">
 			<div class="card" style="margin-top:12px;">
-				<div class="card step" style="margin-top:12px;" data-step="v1.4.0（2026.02.11）">
+				<div class="card step" style="margin-top:12px;" data-step="v1.5.0（2026.02.21）">
 					<div>
-						<p>Home画面に表示されている「(任意の日付)の合計」をタップすることでカロリー以外の合計やPFCバランスのグラフ等、より詳細な情報を確認できるようになりました</p>	
-<!--						<p>食べた！履歴詳細画面と栄養情報詳細画面にもPFCバランスを表すグラフを追加しました</p>-->
+						<p>メーカーや食品情報を情報を登録せずに食べた！を記録できる簡易登録機能を実装しました</p>	
+						<p>食べた！を登録する際、0.1刻みで個数を選択できるようにしました</p>
+						<p>お気に入り登録時にエラーが発生する不具合を修正しました</p>
 						<p>UI周りの調整を行いました</p>
 					</div>
 				</div>
@@ -27,6 +28,12 @@
 					<summary class="muted fav-acc__head"style="font-weight:800;">
 						<span>過去のリリース情報</span>
 					</summary>
+					<div class="card step" style="margin-top:12px;" data-step="v1.4.0（2026.02.11）">
+						<div>
+							<p>Home画面に表示されている「(任意の日付)の合計」をタップすることでカロリー以外の合計やPFCバランスのグラフ等、より詳細な情報を確認できるようになりました</p>	
+							<p>UI周りの調整を行いました</p>
+						</div>
+					</div>
 					<div class="card step" style="margin-top:12px;" data-step="v1.3.0（2026.02.09）">
 						<div>
 							<p>各一覧画面および食品情報登録・栄養情報登録画面に検索・絞り込み機能を追加しました</p>	
@@ -89,7 +96,7 @@
 			</div>
 		</div>
 		<div style="padding-top: 10px;  padding-bottom: 10px;">
-			<p>ゆるゆる間食ログ - v1.4.0</p>
+			<p>ゆるゆる間食ログ - v1.5.0</p>
 			<p>developed by
 				<a href="https://x.com/nolotgsv" style="color: inherit; text-decoration: none;">
 					<b>のる@nolotgsv</b>
@@ -105,7 +112,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">

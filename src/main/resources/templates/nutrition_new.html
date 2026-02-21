@@ -15,11 +15,11 @@
 		<div class="container">
 			<div class="page-title">栄養情報登録</div>
 			<div class="page-sub">食品を選んで分類と栄養情報を登録します</div>
-			<div th:if="${msg}" class="toast" th:text="${msg}">
+			<div th:if="${msg}" class="toast" th:text="${msg}" style="text-align: center;">
 			</div>
-			<div th:if="${errorMsg}" style="font-weight: bold; color: red;" class="toast" th:text="${errorMsg}">
+			<div th:if="${errorMsg}" style="font-weight: bold; color: red; text-align: center;" class="toast" th:text="${errorMsg}">
 			</div>
-			<div th:if="${error}" class="error" th:text="${error}">
+			<div th:if="${error}" class="error" th:text="${error}" style="text-align: center;">
 			</div>
 			<form th:action="@{/nutritions/create}" method="post" class="stack" style="gap: 0px;">
 				<div class="card">
@@ -79,7 +79,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">

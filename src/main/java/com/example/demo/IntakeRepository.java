@@ -36,19 +36,34 @@ public class IntakeRepository {
 	 */
 	public int calcTotalCal(String userId, LocalDate eatenDate) {
 		String sql = """
-				SELECT COALESCE(SUM(n.calorie * i.qty), 0) AS total_kcal
-				FROM intake i
-				INNER JOIN nutrition n
-					ON n.nutrition_id = i.nutrition_id
-				LEFT JOIN food f 
-					ON f.food_id = n.food_id
-				LEFT JOIN maker m
-					ON m.maker_id = f.maker_id
-				WHERE i.regist_user_id = ?
-				AND i.eaten_date = ?
+				SELECT
+					SUM(total_kcal) 
+				FROM( 
+				     SELECT
+						COALESCE(SUM(n.calorie * i.qty), 0) AS total_kcal 
+					FROM
+						intake i 
+					INNER JOIN nutrition n 
+						ON n.nutrition_id = i.nutrition_id 
+					LEFT JOIN food f 
+						ON f.food_id = n.food_id 
+					LEFT JOIN maker m 
+						ON m.maker_id = f.maker_id 
+					WHERE
+						i.regist_user_id = ? 
+						AND i.eaten_date = ?
+					UNION ALL 
+						SELECT
+							COALESCE(SUM(i2.calorie * i2.qty), 0) AS total_kcal 
+						FROM
+							intake_once i2 
+						WHERE
+							i2.regist_user_id = ? 
+							AND i2.eaten_date = ?
+					)
 			""";
 		// intはnullを持てないので一度Integerで受ける
-		Integer v = jdbc.queryForObject(sql, Integer.class, userId, eatenDate);
+		Integer v = jdbc.queryForObject(sql, Integer.class, userId, eatenDate, userId, eatenDate);
 		// 三項演算子（条件 ? 真のときの値 : 偽のときの値）
 		return (v == null) ? 0 : v;
 	}
@@ -125,24 +140,63 @@ public class IntakeRepository {
 	// 対象日の履歴の取得
 	public List<IntakeRow> getDailyRecords(String userId, LocalDate eatenDate){
 		String sql = """
+				WITH base AS ( 
+					SELECT
+						i.intake_id
+						, i.eaten_date
+						, i.eaten_time
+						, i.qty
+						, COALESCE(f.food_name, '削除された食品') AS food_name
+						, n.class_name
+						, n.calorie
+					FROM
+						intake i 
+						INNER JOIN nutrition n 
+							ON n.nutrition_id = i.nutrition_id 
+						LEFT JOIN food f 
+								ON f.food_id = n.food_id 
+					WHERE
+						i.regist_user_id = ?
+						AND i.eaten_date = ?
+				) 
+				, once AS ( 
+					SELECT
+						i2.intake_id AS intake_once_id
+						, i2.eaten_date
+						, i2.eaten_time
+						, i2.qty
+						, COALESCE(i2.food_name, '') AS food_name
+						, i2.class_name
+						, i2.calorie 
+					FROM
+						intake_once i2 
+					WHERE
+						i2.regist_user_id = ?
+						AND i2.eaten_date = ?
+				) 
 				SELECT
-				  i.intake_id,
-				  i.eaten_date,
-				  i.eaten_time,
-				  i.qty,
-				  COALESCE(f.food_name, '削除された食品') AS food_name,
-				  n.class_name,
-				  n.calorie
-				FROM intake i
-				INNER JOIN nutrition n
-					ON n.nutrition_id = i.nutrition_id
-				LEFT JOIN food f 
-					ON f.food_id = n.food_id
-				LEFT JOIN maker m
-					ON m.maker_id = f.maker_id
-				WHERE i.regist_user_id = ?
-				  AND i.eaten_date = ?
-				ORDER BY i.eaten_time ASC, i.intake_id ASC
+					COALESCE(b.intake_id, o.intake_once_id) AS intake_id
+					, CASE 
+						WHEN b.intake_id IS NULL 
+						THEN o.intake_once_id 
+					END AS intake_once_id
+					, COALESCE(b.eaten_date, o.eaten_date) AS eaten_date
+					, COALESCE(b.eaten_time, o.eaten_time) AS eaten_time
+					, COALESCE(b.qty, o.qty) AS qty
+					, COALESCE(b.food_name, o.food_name, '') AS food_name
+					, COALESCE(b.class_name, o.class_name, '簡易登録') AS class_name
+					, COALESCE(b.calorie, o.calorie) AS calorie 
+				FROM
+					base b 
+					FULL OUTER JOIN once o 
+						ON b.eaten_date = o.eaten_date 
+						AND b.eaten_time = o.eaten_time 
+						AND b.qty = o.qty 
+						AND b.food_name = o.food_name 
+						AND b.class_name = o.class_name 
+						AND b.calorie = o.calorie 
+				ORDER BY
+					eaten_time ASC;
 				""";
 		
 		// RowMapperで結果をList<IntakeRow>型で取得
@@ -150,6 +204,7 @@ public class IntakeRepository {
 			sql,
 			(rs, rowNum) -> new IntakeRow(
 			rs.getLong("intake_id"),
+			rs.getLong("intake_once_id"),
 			rs.getString("eaten_date"),
 			rs.getString("eaten_time"),
 			rs.getDouble("qty"),
@@ -157,7 +212,7 @@ public class IntakeRepository {
 			rs.getString("class_name"),
 			rs.getInt("calorie")
 			),
-			userId, eatenDate
+			userId, eatenDate, userId, eatenDate
 		);
 		return records;
 	}
@@ -180,11 +235,11 @@ public class IntakeRepository {
 			      COALESCE(m.maker_name, '削除されたメーカー') AS maker_name,
 			      COALESCE(f.food_name, '削除された食品') AS food_name,
 			      n.class_name,
-			      n.calorie,
-			      COALESCE(n.protein, 0) AS protein,
-			      COALESCE(n.lipid, 0)   AS lipid,
-			      COALESCE(n.carbo, 0)   AS carbo,
-			      COALESCE(n.salt, 0)    AS salt
+			      n.calorie * i.qty AS calorie,
+			      COALESCE(n.protein * i.qty, 0) AS protein,
+			      COALESCE(n.lipid * i.qty, 0)   AS lipid,
+			      COALESCE(n.carbo * i.qty, 0)   AS carbo,
+			      COALESCE(n.salt * i.qty, 0)    AS salt
 			    FROM intake i
 			    INNER JOIN nutrition n 
 				    ON n.nutrition_id = i.nutrition_id
@@ -219,33 +274,102 @@ public class IntakeRepository {
 		return intake;
 	}
 	
+	/*
+	 * 	詳細選択時
+	 * 	履歴の詳細取得を行うメソッド
+	 *	@param	userId ユーザーID  
+	 *	@param	intakeId 食べたID
+	 *	@return	Map<String, Object>
+	 */
+	public Map<String, Object> getIntakeOnceDetail(String userId, long intakeId) {
+		String sql = """
+			    SELECT
+			      intake_id,
+			      eaten_date,
+			      eaten_time,
+			      qty,
+			      '-' AS maker_name,
+			      COALESCE(food_name, '-') AS food_name,
+			      COALESCE(class_name, '簡易登録') AS class_name,
+			      calorie,
+			      protein,
+			      lipid,
+			      carbo,
+			      salt
+			    FROM intake_once
+			    WHERE intake_id = ?
+			      AND regist_user_id = ?
+			""";
+		
+		Map<String, Object> intake = jdbc.queryForObject(
+			    sql,
+			    new Object[]{ intakeId, userId },
+			    (rs, rowNum) -> {
+			        Map<String, Object> map = new HashMap<>();
+			        map.put("intakeOnceId", rs.getLong("intake_id"));
+			        map.put("eatenDate", rs.getString("eaten_date"));
+			        map.put("eatenTime", rs.getString("eaten_time"));
+			        map.put("qty", rs.getDouble("qty"));
+			        map.put("makerName", rs.getString("maker_name"));
+			        map.put("foodName", rs.getString("food_name"));
+			        map.put("className", rs.getString("class_name"));
+			        map.put("calorie", rs.getInt("calorie"));
+			        map.put("protein", rs.getDouble("protein"));
+			        map.put("lipid", rs.getDouble("lipid"));
+			        map.put("carbo", rs.getDouble("carbo"));
+			        map.put("salt", rs.getDouble("salt"));
+			        return map;
+			    }
+			);
+		return intake;
+	}
+	
 	/*--------------------------------------
  		デイリー詳細画面
 	--------------------------------------*/
 	public List<Map<String, Object>> getDailyTotalNutrition(String userId, LocalDate targetDate){
 		String sql = """
-				SELECT	COALESCE(SUM(n.protein), 0) AS protein_g,
-						COALESCE(SUM(n.lipid),   0) AS lipid_g,
-						COALESCE(SUM(n.carbo),   0) AS carbo_g,
-						COALESCE(SUM(n.salt),    0) AS salt_g,
-
-						COALESCE(SUM(n.protein * 4), 0) AS protein_kcal,
-						COALESCE(SUM(n.lipid   * 9), 0) AS lipid_kcal,
-						COALESCE(SUM(n.carbo   * 4), 0) AS carbo_kcal,
-
-						COALESCE(SUM(n.protein * 4 + n.lipid * 9 + n.carbo * 4), 0) AS pfc_kcal_total
-				FROM intake i
-				INNER JOIN nutrition n
-					ON i.nutrition_id = n.nutrition_id
-				INNER JOIN food f
-					ON n.food_id = f.food_id
-				INNER JOIN maker m
-					ON f.maker_id = m.maker_id
-				WHERE i.regist_user_id = ?
-					AND eaten_date = ?
+				SELECT
+					COALESCE(SUM(protein), 0) AS protein_g
+					, COALESCE(SUM(lipid), 0) AS lipid_g
+					, COALESCE(SUM(carbo), 0) AS carbo_g
+					, COALESCE(SUM(salt), 0) AS salt_g
+					, COALESCE(SUM(protein * 4), 0) AS protein_kcal
+					, COALESCE(SUM(lipid * 9), 0) AS lipid_kcal
+					, COALESCE(SUM(carbo * 4), 0) AS carbo_kcal
+					, COALESCE(SUM(protein * 4 + lipid * 9 + carbo * 4), 0) AS pfc_kcal_total 
+				FROM( 
+					SELECT
+						n.protein * i.qty AS protein
+						, n.lipid * i.qty AS lipid
+						, n.carbo * i.qty AS carbo
+						, n.salt  * i.qty AS salt
+				    FROM
+						intake i 
+					INNER JOIN nutrition n 
+						ON i.nutrition_id = n.nutrition_id 
+					INNER JOIN food f 
+						ON n.food_id = f.food_id 
+					INNER JOIN maker m 
+						ON f.maker_id = m.maker_id 
+					WHERE
+						i.regist_user_id = ?
+						AND i.eaten_date = ?
+					UNION ALL 
+						SELECT
+							i2.protein
+							, i2.lipid
+							, i2.carbo
+							, i2.salt 
+						FROM
+							intake_once i2 
+						WHERE
+							i2.regist_user_id = ?
+							AND i2.eaten_date = ?
+				) T1
 			""";
 		
-		return jdbc.queryForList(sql, userId, targetDate);
+		return jdbc.queryForList(sql, userId, targetDate, userId, targetDate);
 	}
 	
 	
@@ -263,6 +387,18 @@ public class IntakeRepository {
 	public int delIntake(long intakeId, String userId) {
 		String sql = "DELETE FROM intake WHERE intake_id = ? AND regist_user_id = ?";
 		return jdbc.update(sql, intakeId, userId);
+	}
+	
+	/*
+	 * 	「削除」押下
+	 * 	intakeテーブルの削除を行うメソッド
+	 *	@param	intakeOnceId intakeId 
+	 * 	@param	userId ユーザーID 
+	 *	@return	削除件数（通常は1）
+	 */
+	public int delIntakeOnce(long intakeOnceId, String userId) {
+		String sql = "DELETE FROM intake_once WHERE intake_id = ? AND regist_user_id = ?";
+		return jdbc.update(sql, intakeOnceId, userId);
 	}
 	
 /*--------------------------------------
@@ -286,6 +422,24 @@ public class IntakeRepository {
 		return jdbc.update(sql, eatenDate, eatenTime, intakeId, userId);
 	}
 	
+	/*
+	 * 	「更新」押下
+	 * 	intakeテーブルの更新を行うメソッド
+	 * 	@param	userId ユーザーID 
+	 *	@param	intakeOnceId intakeOnceId 
+	 * 	@param	eatenDate 食べた日付
+	 *	@param	eatenTime 食べた時刻
+	 *	@return	更新件数（通常は1）
+	 */
+	public int updIntakeOnce(String userId, long intakeOnceId, LocalDate eatenDate, LocalTime eatenTime) {
+		String sql = """
+			       UPDATE intake_Once
+			       SET eaten_date = ?, eaten_time = ?
+			       WHERE intake_id = ? AND regist_user_id = ?
+			     """;
+		return jdbc.update(sql, eatenDate, eatenTime, intakeOnceId, userId);
+	}
+	
 /*--------------------------------------
  	食べた登録画面
 --------------------------------------*/
@@ -298,13 +452,13 @@ public class IntakeRepository {
 	 *	@param	eatenTime 食べた時刻
 	 *	@return	登録件数（通常は1）
 	 */
-	public int insIntake(String userId, long nutritionId, LocalDate eatenDate, LocalTime eatenTime) {
+	public int insIntake(String userId, long nutritionId, LocalDate eatenDate, LocalTime eatenTime, BigDecimal qty) {
 		String sql = """
 		         INSERT INTO intake (regist_user_id, nutrition_id, eaten_date, eaten_time, qty)
-		         VALUES (?, ?, ?, ? ,1)
+		         VALUES (?, ?, ?, ? ,?)
 		     """;
 		// 登録件数を返す（通常 1）。失敗時は例外が投げられることが多い
-		return jdbc.update(sql, userId, nutritionId, eatenDate, eatenTime);
+		return jdbc.update(sql, userId, nutritionId, eatenDate, eatenTime, qty);
 	}
 	
 	/*
@@ -413,6 +567,24 @@ public class IntakeRepository {
 		return jdbc.queryForList(sql, userId, makerId);
 	}
 	
+	
+	/*
+	 * 	簡易登録：登録押下
+	 * 	intake_onceテーブルに登録を行うメソッド
+	 *	@param	userId ユーザーID  
+	 * 	@param	nutritionId 栄養ID 
+	 *	@param	eatenDate 食べた日付
+	 *	@param	eatenTime 食べた時刻
+	 *	@return	登録件数（通常は1）
+	 */
+	public int insIntakeOnce(String userId, String foodName, int calorie, Double protein, Double lipid, Double carbo, Double salt) {
+		String sql = """
+		         INSERT INTO intake_once (food_name, calorie, protein, lipid, carbo, salt, regist_user_id)
+		         VALUES (?, ?, ?, ?, ?, ?, ?)
+		     """;
+		// 登録件数を返す（通常 1）。失敗時は例外が投げられることが多い
+		return jdbc.update(sql, foodName, calorie, protein, lipid, carbo, salt, userId);
+	}
 /*--------------------------------------
  	メーカー登録画面
 --------------------------------------*/

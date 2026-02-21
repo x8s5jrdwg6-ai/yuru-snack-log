@@ -14,7 +14,7 @@
 	<div class="page">
 		<div class="container">
 			<div class="page-title">食べた！登録</div>
-			<div class="page-sub">② 食品を選択</div>
+			<div class="page-sub">食品を選択</div>
 			<div class="row" style="margin-top:10px;">
 				<a class="btn btn-ghost tap" style="margin-right: auto;" th:href="@{/eat}">← メーカー選択へ戻る</a>
 				<a class="btn btn-primary tap" style="margin-left: auto;" th:href="@{/foods/new(makerId=${makerId})}">食品情報登録</a>
@@ -54,10 +54,10 @@
 		</div>
 	</div>
 	<nav class="bottom-nav">
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">

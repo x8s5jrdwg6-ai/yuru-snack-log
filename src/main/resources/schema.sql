@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS intake (
   nutrition_id       integer NOT NULL,
   eaten_date      date NOT NULL,
   eaten_time      time NOT NULL,
-  qty             integer NOT NULL DEFAULT 1
+  qty             numeric(10,1) DEFAULT 1.0
 );
 
 CREATE INDEX IF NOT EXISTS idx_intake_user_time ON intake(regist_user_id, eaten_date, eaten_time);
@@ -60,4 +60,19 @@ CREATE TABLE IF NOT EXISTS favorite (
     sort_order integer NOT NULL DEFAULT 0,
     regist_date timestamp DEFAULT now(),
     UNIQUE (regist_user_id, nutrition_id)
+);
+
+CREATE TABLE IF NOT EXISTS intake_once( 
+    intake_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY
+    , food_name varchar (50)
+    , class_name varchar (50)
+    , calorie integer NOT NULL
+    , protein numeric (10, 1) DEFAULT 0
+    , lipid numeric (10, 1) DEFAULT 0
+    , carbo numeric (10, 1) DEFAULT 0
+    , salt numeric (10, 2) DEFAULT 0
+    , regist_user_id varchar (36) NOT NULL
+    , eaten_date date DEFAULT CURRENT_DATE
+    , eaten_time time DEFAULT CURRENT_TIME
+    , qty numeric(10,1) DEFAULT 1.0
 );

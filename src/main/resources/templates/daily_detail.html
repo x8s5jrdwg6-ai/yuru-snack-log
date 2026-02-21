@@ -32,22 +32,22 @@
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">たんぱく質</div>
 						<div style="font-weight:900; display: flex; justify-content: center;">
-							<span th:text="${dailyTotalNutritionList[0].protein_g}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(dailyTotalNutritionList[0].protein_g, 1, 'NONE', 1, 'POINT')}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">脂質</div>
 						<div style="font-weight:900; display: flex; justify-content: center;">
-							<span th:text="${dailyTotalNutritionList[0].lipid_g}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(dailyTotalNutritionList[0].lipid_g, 1, 'NONE', 1, 'POINT')}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">炭水化物</div>
 						<div style="font-weight:900; display: flex; justify-content: center;">
-							<span th:text="${dailyTotalNutritionList[0].carbo_g}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(dailyTotalNutritionList[0].carbo_g, 1, 'NONE', 1, 'POINT')}">0</span>g</div>
 					</div>
 					<div class="tile">
 						<div class="muted" style=" display: flex; justify-content: center;">塩分</div>
 						<div style="font-weight:900; display: flex; justify-content: center;">
-							<span th:text="${dailyTotalNutritionList[0].salt_g}">0</span>g</div>
+							<span th:text="${#numbers.formatDecimal(dailyTotalNutritionList[0].salt_g, 1, 'NONE', 2, 'POINT')}">0</span>g</div>
 					</div>
 				</div>
 				<div id="chart" style="margin-top: 20px;" th:if="${dailyTotalNutritionList[0].protein_kcal + dailyTotalNutritionList[0].lipid_kcal + dailyTotalNutritionList[0].carbo_kcal != 0.0}">
@@ -65,7 +65,7 @@
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/}">
 			<i class="fa-solid fa-house"></i> Home
 		</a>
-		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat}">
+		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/eat/menu}">
 			<i class="fa-solid fa-utensils"></i> 　食べた！
 		</a>
 		<a class="nav-item menu-btn" style="opacity: 0.5;" th:href="@{/menu}">
