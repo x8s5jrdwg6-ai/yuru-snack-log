@@ -52,6 +52,7 @@
 					</a>
 				</div>
 			</a>
+			<!-- お気に入り -->
 			<div class="card favorite-row">
 				<details class="fav-acc">
 					<summary class="muted fav-acc__head"style="font-weight:800;">
@@ -59,13 +60,12 @@
 					</summary>
 					<div class="card favorite-chip" th:each="fav, stat : ${favoriteList}">
 						<div class="row">
-							<div>
+							<div style="display: flex; flex-direction: column; width:100%;">
 								<div  style="width: 100%;">
 									<p class="fav-food" th:text="${fav['food_name']}" style="margin: 0; font-weight:900;">food</p>
 									<p class="fav-class muted" th:text="${fav['class_name']}" style="font-size: 75%; margin: 0;">class</span>
 								</div>
-								<div class="row" style="display: flex; justify-content: center; margin: 15px auto 0;
-">
+								<div class="row" style="display: flex; justify-content: center; margin: 15px auto 0;">
 									<form th:if="${!stat.first}" th:action="@{/swap/favorite}" method="post">
 										<input type="hidden" name="favoriteId" th:value="${fav['favorite_id']}">
 										<input type="hidden" name="direction" value="UP">
@@ -78,7 +78,6 @@
 									</form>
 								</div>
 							</div>
-
 							<div style="white-space: nowrap; margin-left:auto">
 								<form th:action="@{/eat/record}" method="post" style="margin:0;">
 									<input type="hidden" name="nutritionId" th:value="${fav['nutrition_id']}">
