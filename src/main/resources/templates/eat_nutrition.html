@@ -33,7 +33,10 @@
 			</div>
 			<div class="card" th:if="${!#lists.isEmpty(nutritions)}">
 					<div class="row" style="justify-content:space-between; align-items:flex-start;">
-						<div class="muted" style="font-weight:800; margin-bottom:10px;">分類一覧</div>
+						<div class="muted" style="font-weight:800; margin-bottom:10px; white-space: nowrap;">分類一覧</div>
+<!--						<label for="stapleFlg" class="switch_label" style="inline-size: auto; white-space: nowrap; display: flex;">-->
+<!--							<span class="muted">主食</span><input type="checkbox" id="stapleFlg" name="stapleFlg" value="true">-->
+<!--						</label>-->
 					</div>
 					<div class="stack">
 						<div class="card" th:each="fl : ${nutritions}" style="padding:12px;">
@@ -44,16 +47,19 @@
 										<span th:text="${fl.calorie}">0</span>kcal
 									</div>
 								</div>
-								<form th:action="@{/eat/record}" method="post" style="margin:0;">
-									<input type="hidden" name="nutritionId" th:value="${fl.nutrition_id}">
-									<input type="hidden" name="qty" value="1.0" class="qty-hidden">
-									<div class="qty-stepper" data-step="0.1" data-min="0.1">
-										<button type="button" class="btn btn-ghost tap qty-dec" aria-label="減らす">−</button>
-										<input type="number" class="qty-input" value="1.0" step="0.1" min="0.1" inputmode="decimal" style="width:68px; text-align:center; font-weight:900;">
-										<button type="button" class="btn btn-ghost tap qty-inc" aria-label="増やす">＋</button>
-									</div>
-									<button class="btn btn-primary tap" type="submit" style="display: flex; margin: 15px auto 0;">食べた！</button>
-								</form>
+								<div style="white-space: nowrap; margin-left:auto">
+									<form th:action="@{/eat/record}" method="post" style="margin:0;">
+<!--										<input type="hidden" name="stapleFlg" value="false" class="staple-hidden">-->
+										<input type="hidden" name="nutritionId" th:value="${fl.nutrition_id}">
+										<input type="hidden" name="qty" value="1.0" class="qty-hidden">
+										<div class="qty-stepper" data-step="0.1" data-min="0.1">
+											<button type="button" class="btn btn-ghost tap qty-dec" aria-label="減らす">−</button>
+											<input type="number" class="qty-input" value="1.0" step="0.1" min="0.1" inputmode="decimal" style="width:68px; text-align:center; font-weight:900;">
+											<button type="button" class="btn btn-ghost tap qty-inc" aria-label="増やす">＋</button>
+										</div>
+										<button class="btn btn-primary tap" type="submit" style="display: flex; margin: 15px auto 0;">食べた！</button>
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -135,6 +141,28 @@
 		});
 
 		document.querySelectorAll(".qty-stepper").forEach(syncHidden);
+		
+//		// 主食フラグ
+//		const stapleSwitch = document.getElementById("stapleFlg");
+//
+//		const syncStapleAll = () => {
+//		  const on = !!stapleSwitch?.checked;
+//		  document.querySelectorAll(".staple-hidden").forEach(h => {
+//		    h.value = on ? "true" : "false";
+//		  });
+//		};
+//
+//		document.addEventListener("change", (e) => {
+//		  if (e.target === stapleSwitch) syncStapleAll();
+//		});
+//
+//		// 初期同期
+//		syncStapleAll();
+//
+//		// 念のため submit 直前にも同期（事故防止）
+//		document.addEventListener("submit", (e) => {
+//		  if (e.target.matches('form[method="post"]')) syncStapleAll();
+//		}, true);
 	</script>
 </body>
 
